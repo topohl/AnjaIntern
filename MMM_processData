@@ -11,8 +11,16 @@ library(lubridate)   # load lubridate package for date and time functions
 library(tidyr)
 library(forcats)
 
+
+##csv path for sus animals
+working_directory <- "S:/Lab_Member/Anja"
+csv_sus_animals <-  paste0(working_directory,"/sus_animals.csv")
+sus_animals <- readLines(csv_sus_animals)
+
 # set the working directory to the parent directory containing the subfolders
 setwd("S:/Lab_Member/Tobi/Experiments/Exp9_Social-Stress/Raw Data/Behavior/RFID/BatchAnalysis")
+
+##############################################################################################################
 
 # get a list of all subfolders in the directory
 subfolders <- list.dirs(".", recursive = FALSE)
@@ -114,27 +122,7 @@ data_filtered_agg <- data_filtered %>%
 
 # Create a new column 'SUS'
 data_filtered_agg <- data_filtered_agg %>%
-mutate(SUS = AnimalNum %in% c("0001", "0004", "OR750", "OR751", "OR755", "OR762", "OR764", "OR770", "OR771", "OR106", "OR111", "OR112", "OR113", "OR120", "OR134", 
-                              "OR420",
-                              "OR424",
-                              "OR426",
-                              "OR428",
-                              "OR432",
-                              "OR433",
-                              "OR434",
-                              "OR1545",
-                              "OR1546",
-                              "OR1547",
-                              "OR529",
-                              "OR530",
-                              "OR531",
-                              "OR550",
-                              "OR551",
-                              "OR552",
-                              "OR553",
-                              "OR554",
-                              "OR555",
-                              "OR556"))
+  mutate(SUS = AnimalNum %in% sus_animals)
 
 # Combine the two datetime columns to form the interval
 data_filtered_agg$DateTime30MinShifted <- lead(data_filtered_agg$DateTime30Min)
