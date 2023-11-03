@@ -14,7 +14,7 @@ library(openxlsx)     # load openxlsx package for writing xlsx files
 
 
 #include functions
-working_directory <- "S:/Lab_Member/Anja"
+working_directory <- "S:/Lab_Member/Anja/Git/AnjaIntern"
 source(paste0(working_directory,"/MMM_functions.R"))
 
 # set the working directory to the parent directory containing the subfolders an get a list of the B1 and B2 subfolders in the directory
@@ -51,9 +51,10 @@ data <- map_dfr(subfolders, ~{
   # all_files <- map(subfolders, ~list.files(path = .x, pattern = c("E9_SIS_B2_EPMaftrecagechange_ActivityIndex.csv"), full.names = TRUE)) %>% 
   # flatten()
   
-  # process all files and combine into a single data frame
+  # process all files(add new columns) and combine into a single data frame
   all_data <- map(all_files, ~process_file(.x)) %>% 
     bind_rows()
   
   all_data
-})
+})})
+

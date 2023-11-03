@@ -15,7 +15,7 @@ sleep_directory <- "S:/Lab_Member/Tobi/Experiments/Exp9_Social-Stress/Analysis/S
 ##graphs directory path for plots
 graphs_directory <- "S:/Lab_Member/Tobi/Experiments/Exp9_Social-Stress/Analysis/SIS_Analysis/statistics/sleep/graphs"
 ##working directory path
-working_directory <- "S:/Lab_Member/Anja"
+working_directory <- "S:/Lab_Member/Anja/Git/AnjaIntern"
 
 
 # Include functions

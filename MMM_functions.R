@@ -15,6 +15,17 @@ process_file <- function(file_path) {
     select(-filename) # remove the filename column
 }
 
+#function to decide the sex of the mouse depending on the batch number
+male_or_female <- function(batch){
+  batch_name <-  str_extract(batch, "B\\d")
+  if(batch_name == "B1" || batch_name == "B2"){
+    return("male")
+  }else{ #batch_name == "B3" || batch_name == "B4"
+    return("female")
+  }
+}
+  
+
 # function to process and save as XLSX file
 process_and_save_xlsx <- function(file_path) {
   file_base <- sub(".csv", "", basename(file_path))

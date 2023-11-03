@@ -12,18 +12,28 @@ library(tidyr)
 library(forcats)
 
 
+
+
 ##csv path for sus animals
-working_directory <- "S:/Lab_Member/Anja"
+working_directory <- "S:/Lab_Member/Anja/Git/AnjaIntern"
 csv_sus_animals <-  paste0(working_directory,"/sus_animals.csv")
 sus_animals <- readLines(csv_sus_animals)
 
+#include functions
+source(paste0(working_directory,"/MMM_functions.R"))
+
 # set the working directory to the parent directory containing the subfolders
 setwd("S:/Lab_Member/Tobi/Experiments/Exp9_Social-Stress/Raw Data/Behavior/RFID/BatchAnalysis")
+
 
 ##############################################################################################################
 
 # get a list of all subfolders in the directory
 subfolders <- list.dirs(".", recursive = FALSE)
+
+#add a new column "Sex" depending on the Batch Number
+data <- data %>% rowwise() %>%
+  mutate(Sex = (male_or_female(Batch)))
 
 # separate the Animal column into AnimalNumber and Cage columns
 data <- separate(data, Animal, c("AnimalNum", "Cage"), sep = "_", remove = FALSE)
