@@ -60,7 +60,7 @@ total_sleep_info_per_change <- total_sleep_info_per_change %>%
 
 # Summarize the data
 summarized_data <- total_sleep_info_per_change %>%
-  group_by_at(intersect(c("AnimalNum", "Phase"), names(total_sleep_info_per_change))) %>%  #checks if "Phase" and "AnimalNum") exist in total_sleep_info_per_change
+  group_by_at(intersect(c("AnimalNum", "Phase"), names(total_sleep_info_per_change))) %>%  #checks if "Phase" and "AnimalNum" exist in total_sleep_info_per_change
   summarize(
     Batch = first(Batch),
     Group = first(Group),
@@ -76,6 +76,7 @@ summarized_data <- total_sleep_info_per_change %>%
 # Read data from the Excel file
 overallData <- summarized_data
 
+###################### testing and plotting ############################################################
 
 # Get the list of columns to plot (excluding "ID", "Group", "Sex")
 columnsToPlot <- setdiff(names(overallData), c("AnimalNum", "Group", "Phase", "Batch"))
@@ -104,6 +105,8 @@ for (variable in columnsToPlot) {
 # Convert the list of test results to a data frame
 allTestResultsDf <- bind_rows(allTestResults)
 
+####################### saving the results #############################################################
+
 # Save the test results data frame to a CSV file
 write.csv(allTestResultsDf, file = paste0(sleep_directory,"/test_results_Sleep.csv"), row.names = FALSE)
 # Save the post hoc results to a CSV file
@@ -131,6 +134,8 @@ if (include_phase) {
     ggsave(filename = paste0(graphs_directory,"/", variableName, ".svg"), plot = allPlots[[i]], width = 2.8, height = 3)
   }
 }
+
+########################################################################################################
 
 # Initialize an empty list to store plots
 allPlots <- list()
