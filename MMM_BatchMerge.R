@@ -56,5 +56,5 @@ data <- map_dfr(subfolders, ~{
     bind_rows()
   
   all_data
-})})
+})
 
