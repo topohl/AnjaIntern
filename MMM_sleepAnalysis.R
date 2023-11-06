@@ -87,11 +87,15 @@ allPlots <- list()
 allPosthocResults <- list()
 
 
-#sex <- c("male", "female") ???
+#declare vectors of the variables which are not always included
+phases <-  "combined phases"
+if(include_phase) phases <-  c("Active", "Inactive")
+phases <-  "combined phases"
+if(include_sex) sexes <- c("male", "female")
 
 # Iterate through each variable and phase, and perform tests
 for (variable in columnsToPlot) {
-  for (phase in c("Active", "Inactive")) {
+  for (phase in phases) {
     result <- testAndPlotVariable(overallData, variable, phase)
     # add result-list(containing the columns testResults, plot, posthocResults) to other fitting list
     if (!is.null(result)) {
@@ -148,7 +152,7 @@ allPlots <- list()
 
 # Iterate through each variable and phase, and perform tests
 for (variable in columnsToPlot) {
-  for (phase in c("Active", "Inactive")) {
+  for (phase in phases) {
     result <- testAndPlotVariable(overallData, variable, phase)
     if (!is.null(result)) {
       allPlots <- c(allPlots, list(result$plot))
