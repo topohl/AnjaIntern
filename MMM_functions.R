@@ -15,6 +15,8 @@ process_file <- function(file_path) {
     select(-filename) # remove the filename column
 }
 
+
+
 #function to decide the sex of the mouse depending on the batch number
 male_or_female <- function(batch){
   batch_name <-  str_extract(batch, "B\\d")
@@ -25,6 +27,8 @@ male_or_female <- function(batch){
   }
 }
   
+
+
 
 # function to process and save as XLSX file
 process_and_save_xlsx <- function(file_path) {
@@ -68,6 +72,8 @@ process_and_save_xlsx <- function(file_path) {
 #total_sleep_info_per_change <- calculate_total_sleep_info(data_filtered)
 
 
+
+
 # Function to generate plots for each variable and phase
 generatePlot <- function(overallData, variableName, phase) {
   filteredData <- overallData %>%
@@ -107,6 +113,8 @@ generatePlot <- function(overallData, variableName, phase) {
   return(p)
 }
 
+
+
 # Function to perform Wilcoxon rank-sum test
 performWilcoxonTest <- function(dataGroup1, dataGroup2) {
   if (length(dataGroup1) >= 3 && length(dataGroup2) >= 3) {
@@ -129,6 +137,8 @@ performPosthocAnova <- function(data, variableName) {
   return(pairwiseResults)
 }
 
+
+
 # Function to perform post hoc pairwise tests for Kruskal-Wallis
 performPosthocKruskal <- function(data, variableName) {
   kruskalTest <- kruskal.test(as.formula(paste(variableName, "~ Group")), data = data)
@@ -138,6 +148,8 @@ performPosthocKruskal <- function(data, variableName) {
   return(pairwiseResults)
 }
 
+
+
 # Function to perform normality test and appropriate statistical test for each variable and phase
 testAndPlotVariable <- function(data, variableName, phase) {
   
@@ -145,7 +157,7 @@ testAndPlotVariable <- function(data, variableName, phase) {
     filter(if (include_phase) Phase == phase else TRUE) %>%   # Include/exclude "Phase" based on the variable
     filter(if (include_sex) Sex == sex else TRUE)            # Include/exclude "Sex" based on the variable
   
-  uniqueGroups <- unique(filteredData$Group)
+  uniqueGroups <- unique(filteredData$Group)  #SUS,RES,CON...
   numGroups <- length(uniqueGroups)
   
   # Check if the variable is numeric
