@@ -93,13 +93,16 @@ allPosthocResults <- list()
 for (variable in columnsToPlot) {
   for (phase in c("Active", "Inactive")) {
     result <- testAndPlotVariable(overallData, variable, phase)
+    # add result-list(containing the columns testResults, plot, posthocResults) to other fitting list
     if (!is.null(result)) {
+      # posthochResults is always NULL for the Wilcoxon test
       if (is.null(result$posthocResults)) {
         allTestResults <- c(allTestResults, list(result$testResults))
       } else {
         allTestResults <- c(allTestResults, list(result$testResults))
         allPosthocResults <- c(allPosthocResults, list(result$posthocResults))
       }
+      #add the plot
       allPlots <- c(allPlots, list(result$plot))
     }
   }

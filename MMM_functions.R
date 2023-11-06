@@ -154,14 +154,17 @@ performPosthocKruskal <- function(data, variableName) {
 # Function to perform normality test and appropriate statistical test for each variable and phase
 testAndPlotVariable <- function(data, variableName, phase) {
   
+  #filtering specific phase or sex if needed 
   filteredData <- data %>%
     filter(if (include_phase) Phase == phase else TRUE) %>%   # Include/exclude "Phase" based on the variable
     filter(if (include_sex) Sex == sex else TRUE)            # Include/exclude "Sex" based on the variable
   
+  # save unique group names
   uniqueGroups <- unique(filteredData$Group)  #SUS,RES,CON...
+  # number of different groups in data
   numGroups <- length(uniqueGroups)
   
-  # Check if the variable is numeric
+  # Check if the variable is numeric (if not, return Null)
   if (is.numeric(filteredData[[variableName]])) {
     if (numGroups == 2) {
       group1 <- uniqueGroups[1]
@@ -170,9 +173,11 @@ testAndPlotVariable <- function(data, variableName, phase) {
       dataGroup1 <- filteredData[[variableName]][filteredData$Group == group1]
       dataGroup2 <- filteredData[[variableName]][filteredData$Group == group2]
       
+      # if there are more than 3 columns containing the name of group1 AND group 2 , perform Wilcoxon test
       if (sum(!is.na(dataGroup1)) >= 3 && sum(!is.na(dataGroup2)) >= 3) {
         wilcoxRes <- performWilcoxonTest(dataGroup1, dataGroup2)
         
+        #if results of Wilcoxontest are not empty add results to testResults
         if (!is.null(wilcoxRes)) {
           testResults <- list(
             Variable = variableName,
@@ -185,15 +190,19 @@ testAndPlotVariable <- function(data, variableName, phase) {
             Significance_Level = sprintf("%.3f", wilcoxRes$p.value)
           )
           
+          #generate plot of wilcoxontest results
           p <- generatePlot(filteredData, variableName, phase)
           
           return(list(testResults = testResults, plot = p, posthocResults = NULL))
         }
       }
-    } else {
+    } else {  # (sum(!is.na(dataGroup1)) < 3 || sum(!is.na(dataGroup2)) < 3) means one of the groups has less than 3 columns
+      ## NORMALIZATION
+      # normalize group CON and RES with Shapiro-Wilk Normality Test
       conNorm <- shapiro.test(filteredData[[variableName]][filteredData$Group == "CON"])
       resNorm <- shapiro.test(filteredData[[variableName]][filteredData$Group == "RES"])
       
+      # normalize group SUS, if it exists, else declare it to 1
       susGroupExists <- any(filteredData$Group == "SUS")
       if (susGroupExists) {
         susNorm <- shapiro.test(filteredData[[variableName]][filteredData$Group == "SUS"])
@@ -201,10 +210,12 @@ testAndPlotVariable <- function(data, variableName, phase) {
         susNorm <- list(p.value = 1)
       }
       
+      #if one of the p values of the normalizations is empty, return NULL
       if (is.na(conNorm$p.value) || is.na(resNorm$p.value) || is.na(susNorm$p.value)) {
         return(NULL)
       }
       
+      # register Normalization test results in testResults for return
       testResults <- list(
         Variable = variableName,
         Phase = phase,
@@ -213,9 +224,11 @@ testAndPlotVariable <- function(data, variableName, phase) {
         SUS_Normality = susNorm$p.value
       )
       
+      # initialize empty dataframes for ANOVA
       testResultsDf <- data.frame()
       posthocResultsDf <- data.frame()
       
+      ## ANOVA
       if (numGroups > 2) {
         if (conNorm$p.value >= 0.05 && resNorm$p.value >= 0.05 && susNorm$p.value >= 0.05) {
           anovaTest <- aov(as.formula(paste(variableName, "~ Group")), data = filteredData)
@@ -242,6 +255,7 @@ testAndPlotVariable <- function(data, variableName, phase) {
         }
       }
       
+      #generate plots in p for return
       p <- generatePlot(filteredData, variableName, phase)
       
       return(list(testResults = testResults, plot = p, posthocResults = testResultsDf))
