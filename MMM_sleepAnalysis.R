@@ -60,7 +60,7 @@ total_sleep_info_per_change <- total_sleep_info_per_change %>%
 
 # Summarize the data
 summarized_data <- total_sleep_info_per_change %>%
-  group_by_at(intersect(c("AnimalNum", "Phase"), names(total_sleep_info_per_change))) %>%  #checks if "Phase" and "AnimalNum" exist in total_sleep_info_per_change
+  group_by_at(intersect(c("AnimalNum", "Phase", "Sex"), names(total_sleep_info_per_change))) %>%  #checks if "Phase", "AnimalNum" and "Sex" exist in total_sleep_info_per_change
   summarize(
     Batch = first(Batch),
     Group = first(Group),
@@ -73,18 +73,21 @@ summarized_data <- total_sleep_info_per_change %>%
   ungroup()
 
 
-# Read data from the Excel file
+# Rename
 overallData <- summarized_data
 
 ###################### testing and plotting ############################################################
 
-# Get the list of columns to plot (excluding "ID", "Group", "Sex")
-columnsToPlot <- setdiff(names(overallData), c("AnimalNum", "Group", "Phase", "Batch"))
+# Get the list of columns to plot (excluding non numeric values, which are added manually)
+columnsToPlot <- setdiff(names(overallData), c("AnimalNum", "Group", "Phase", "Batch", "Sex"))
 
 # Initialize empty lists
 allTestResults <- list()
 allPlots <- list()
 allPosthocResults <- list()
+
+
+#sex <- c("male", "female") ???
 
 # Iterate through each variable and phase, and perform tests
 for (variable in columnsToPlot) {

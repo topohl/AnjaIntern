@@ -71,7 +71,7 @@ process_and_save_xlsx <- function(file_path) {
 # Function to generate plots for each variable and phase
 generatePlot <- function(overallData, variableName, phase) {
   filteredData <- overallData %>%
-    filter(if (include_phase) Phase == phase else TRUE)  # Include/exclude "Phase" based on the variable
+    filter(if (include_phase) Phase == phase else TRUE) %>%  # Include/exclude "Phase" based on the variable
     filter(if (include_sex) Sex == sex else TRUE)  # Include/exclude "Sex" based on the variable
   
   
@@ -140,9 +140,10 @@ performPosthocKruskal <- function(data, variableName) {
 
 # Function to perform normality test and appropriate statistical test for each variable and phase
 testAndPlotVariable <- function(data, variableName, phase) {
+  
   filteredData <- data %>%
-    filter(if (include_phase) Phase == phase else TRUE)  # Include/exclude "Phase" based on the variable
-    filter(if (include_sex) Sex == sex else TRUE)  # Include/exclude "Sex" based on the variable
+    filter(if (include_phase) Phase == phase else TRUE) %>%   # Include/exclude "Phase" based on the variable
+    filter(if (include_sex) Sex == sex else TRUE)            # Include/exclude "Sex" based on the variable
   
   uniqueGroups <- unique(filteredData$Group)
   numGroups <- length(uniqueGroups)
