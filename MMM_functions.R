@@ -18,6 +18,7 @@ process_file <- function(file_path) {
 
 
 #function to decide the sex of the mouse depending on the batch number
+#Input "batch" is batch number of the individual
 male_or_female <- function(batch){
   batch_name <-  str_extract(batch, "B\\d")
   if(batch_name == "B1" || batch_name == "B2"){
