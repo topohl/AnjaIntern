@@ -76,7 +76,7 @@ process_and_save_xlsx <- function(file_path) {
 
 
 # Function to generate plots for each variable and phase
-generatePlot <- function(overallData, variableName, phase) {
+generatePlot <- function(overallData, variableName, phase, sex) {
   filteredData <- overallData %>%
     filter(if (include_phase) Phase == phase else TRUE) %>%  # Include/exclude "Phase" based on the variable
     filter(if (include_sex) Sex == sex else TRUE)  # Include/exclude "Sex" based on the variable
@@ -97,7 +97,7 @@ generatePlot <- function(overallData, variableName, phase) {
       na.rm = TRUE
     ) +
     labs(title = bquote(~bold(.(variableName))),
-         subtitle = paste("(", phase, ")", sep = ""),
+         subtitle = paste("(", phase, ", ", sex, ")", sep = ""),
          caption = "",
          x = NULL,
          y = "z score [a.u.]") +
@@ -152,7 +152,7 @@ performPosthocKruskal <- function(data, variableName) {
 
 
 # Function to perform normality test and appropriate statistical test for each variable and phase
-testAndPlotVariable <- function(data, variableName, phase) {
+testAndPlotVariable <- function(data, variableName, phase, sex) {
   
   #filtering specific phase or sex if needed 
   filteredData <- data %>%
@@ -182,6 +182,7 @@ testAndPlotVariable <- function(data, variableName, phase) {
           testResults <- list(
             Variable = variableName,
             Phase = phase,
+            Sex = sex,
             Test = "Wilcoxon rank-sum test",
             CON_Normality = NA,
             RES_Normality = NA,
@@ -191,7 +192,7 @@ testAndPlotVariable <- function(data, variableName, phase) {
           )
           
           #generate plot of wilcoxontest results
-          p <- generatePlot(filteredData, variableName, phase)
+          p <- generatePlot(filteredData, variableName, phase, sex)
           
           return(list(testResults = testResults, plot = p, posthocResults = NULL))
         }
@@ -219,6 +220,7 @@ testAndPlotVariable <- function(data, variableName, phase) {
       testResults <- list(
         Variable = variableName,
         Phase = phase,
+        Sex = sex,
         CON_Normality = conNorm$p.value,
         RES_Normality = resNorm$p.value,
         SUS_Normality = susNorm$p.value
@@ -256,7 +258,7 @@ testAndPlotVariable <- function(data, variableName, phase) {
       }
       
       #generate plots in p for return
-      p <- generatePlot(filteredData, variableName, phase)
+      p <- generatePlot(filteredData, variableName, phase, sex)
       
       return(list(testResults = testResults, plot = p, posthocResults = testResultsDf))
     }

@@ -23,7 +23,7 @@ source(paste0(working_directory,"/MMM_functions.R"))
 
 
 # Define the variable to include/exclude some columns
-include_phase <- TRUE # Set to TRUE to include "Phase" or FALSE to exclude
+include_phase <- FALSE # Set to TRUE to include "Phase" or FALSE to exclude
 include_sex <- FALSE  #same with sex
 
 # Define SUS animals
@@ -90,24 +90,27 @@ allPosthocResults <- list()
 #declare vectors of the variables which are not always included
 phases <-  "combined phases"
 if(include_phase) phases <-  c("Active", "Inactive")
-phases <-  "combined phases"
+sexes <-  "combined sexes"
 if(include_sex) sexes <- c("male", "female")
 
 # Iterate through each variable and phase, and perform tests
 for (variable in columnsToPlot) {
   for (phase in phases) {
-    result <- testAndPlotVariable(overallData, variable, phase)
-    # add result-list(containing the columns testResults, plot, posthocResults) to other fitting list
-    if (!is.null(result)) {
-      # posthochResults is always NULL for the Wilcoxon test
-      if (is.null(result$posthocResults)) {
-        allTestResults <- c(allTestResults, list(result$testResults))
-      } else {
-        allTestResults <- c(allTestResults, list(result$testResults))
-        allPosthocResults <- c(allPosthocResults, list(result$posthocResults))
+    for(sex in sexes){
+      result <- testAndPlotVariable(overallData, variable, phase, sex)
+      # add result-list(containing the columns testResults, plot, posthocResults) to other fitting list
+      if (!is.null(result)) {
+        # posthochResults is always NULL for the Wilcoxon test
+        if (is.null(result$posthocResults)) {
+          allTestResults <- c(allTestResults, list(result$testResults))
+        } else {
+          allTestResults <- c(allTestResults, list(result$testResults))
+          allPosthocResults <- c(allPosthocResults, list(result$posthocResults))
+        }
+        #add the plot
+        allPlots <- c(allPlots, list(result$plot))
       }
-      #add the plot
-      allPlots <- c(allPlots, list(result$plot))
+      
     }
   }
 }
@@ -153,9 +156,11 @@ allPlots <- list()
 # Iterate through each variable and phase, and perform tests
 for (variable in columnsToPlot) {
   for (phase in phases) {
-    result <- testAndPlotVariable(overallData, variable, phase)
-    if (!is.null(result)) {
-      allPlots <- c(allPlots, list(result$plot))
+    for(sex in sexes){
+      result <- testAndPlotVariable(overallData, variable, phase, sex)
+      if (!is.null(result)) {
+        allPlots <- c(allPlots, list(result$plot))
+      }
     }
   }
 }
