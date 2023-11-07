@@ -26,6 +26,17 @@ source(paste0(working_directory,"/MMM_functions.R"))
 include_phase <- FALSE # Set to TRUE to include "Phase" or FALSE to exclude
 include_sex <- FALSE  #same with sex
 
+#if Phase column doesnt exist in dataframe dont include them
+if (include_phase && !("Phase" %in% colnames(data_filtered))){
+  cat("data_filtered does not contain the column Phase, include_phase stays FALSE")
+  include_phase <- FALSE
+}
+#if Sex column doesnt exist in dataframe dont include them
+if (include_sex && !("Sex" %in% colnames(data_filtered))){
+  cat("data_filtered does not contain the column Sex, include_sex stays FALSE")
+  include_sex <- FALSE
+}
+
 # Define SUS animals
 ##csv path for sus animals
 csv_sus_animals <-  paste0(working_directory,"/sus_animals.csv")
@@ -37,8 +48,6 @@ groupColors <- c("#1e3791", "#76A2E8", "#F79719")
 
 #########################################################################################################
 
-#desired_columns <- c("AnimalNum", "Batch", "Change", "Group", "Phase", "Sex")
-#existing_columns <- intersect(desired_columns, names(data_filtered))
 
 total_sleep_info_per_change <- data_filtered %>%
   group_by_at(intersect(c("AnimalNum", "Batch", "Change", "Group", "Phase", "Sex"), names(data_filtered))) %>%  #checks if all column names(esp."Phase" and "Sex") exist in data_filtered
