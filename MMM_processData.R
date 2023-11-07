@@ -14,10 +14,13 @@ library(forcats)
 
 
 
-##csv path for sus animals
 working_directory <- "S:/Lab_Member/Anja/Git/AnjaIntern"
+
+##csv path for sus animals
 csv_sus_animals <-  paste0(working_directory,"/sus_animals.csv")
 sus_animals <- readLines(csv_sus_animals)
+##csv path for con animals
+con_animals <- readLines(paste0(working_directory,"/con_animals.csv"))
 
 #include functions
 source(paste0(working_directory,"/MMM_functions.R"))
@@ -58,8 +61,9 @@ data <- data %>%
       "FALSE"
     ),
     Batch = as.factor(Batch), # convert Batch to a factor variable
+    # change information of group for control animals
     Group = ifelse(
-      AnimalNum %in% c("OR413", "OR414", "OR415", "OR416", "OR537", "OR538", "OR539", "OR540"),
+      AnimalNum %in% con_animals,
       "CON",
       "SIS"
     )
