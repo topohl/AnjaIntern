@@ -162,19 +162,19 @@ if (include_phase) {
 ########################################################################################################
 
 # Initialize an empty list to store plots
-allPlots <- list()
+#allPlots <- list()
 
 # Iterate through each variable and phase, and perform tests
-for (variable in columnsToPlot) {
-  for (phase in phases) {
-    for(sex in sexes){
-      result <- testAndPlotVariable(overallData, variable, phase, sex)
-      if (!is.null(result)) {
-        allPlots <- c(allPlots, list(result$plot))
-      }
-    }
-  }
-}
+#for (variable in columnsToPlot) {
+#  for (phase in phases) {
+#    for(sex in sexes){
+#      result <- testAndPlotVariable(overallData, variable, phase, sex)
+#      if (!is.null(result)) {
+#        allPlots <- c(allPlots, list(result$plot))
+#      }
+#    }
+#  }
+#}
 
 # Create a grid of plots
 grid.arrange(grobs = allPlots, ncol = 4)
