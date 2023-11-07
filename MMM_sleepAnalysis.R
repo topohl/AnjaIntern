@@ -23,8 +23,8 @@ source(paste0(working_directory,"/MMM_functions.R"))
 
 
 # Define the variable to include/exclude some columns
-include_phase <- FALSE # Set to TRUE to include "Phase" or FALSE to exclude
-include_sex <- FALSE  #same with sex
+include_phase <- TRUE # Set to TRUE to include "Phase" or FALSE to exclude
+include_sex <- TRUE  #same with sex
 
 #if Phase column doesnt exist in dataframe dont include them
 if (include_phase && !("Phase" %in% colnames(data_filtered))){
@@ -46,12 +46,12 @@ sus_animals <- readLines(csv_sus_animals)
 groupColors <- c("#1e3791", "#76A2E8", "#F79719")
 
 
-#########################################################################################################
+################################ Calculating and summarizing #########################################################
 
-
+#add new columns(SleepCount, TotalCount...) to dataframe containing the required calculations
 total_sleep_info_per_change <- data_filtered %>%
   group_by_at(intersect(c("AnimalNum", "Batch", "Change", "Group", "Phase", "Sex"), names(data_filtered))) %>%  #checks if all column names(esp."Phase" and "Sex") exist in data_filtered
-  summarise(
+  summarize(
     SleepCount = sum(ActivityIndex == 0),
     TotalCount = n(),
     PercentageSleep = (SleepCount / TotalCount) * 100,
@@ -62,12 +62,14 @@ total_sleep_info_per_change <- data_filtered %>%
 
 
 # Update Group column based on SUS animals
+# overwrites some SIS and CON to SUS and RES groups
 total_sleep_info_per_change <- total_sleep_info_per_change %>%
   mutate(
     Group = if_else(AnimalNum %in% sus_animals, "SUS", if_else(Group == "SIS", "RES", Group))
   )
 
 # Summarize the data
+# creates an overview of the sleep-activity of each individual
 summarized_data <- total_sleep_info_per_change %>%
   group_by_at(intersect(c("AnimalNum", "Phase", "Sex"), names(total_sleep_info_per_change))) %>%  #checks if "Phase", "AnimalNum" and "Sex" exist in total_sleep_info_per_change
   summarize(
@@ -109,7 +111,7 @@ for (variable in columnsToPlot) {
       result <- testAndPlotVariable(overallData, variable, phase, sex)
       # add result-list(containing the columns testResults, plot, posthocResults) to other fitting list
       if (!is.null(result)) {
-        # posthochResults is always NULL for the Wilcoxon test
+        # posthocResults is always NULL for the Wilcoxon test
         if (is.null(result$posthocResults)) {
           allTestResults <- c(allTestResults, list(result$testResults))
         } else {
