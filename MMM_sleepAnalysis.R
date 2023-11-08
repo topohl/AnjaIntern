@@ -23,8 +23,8 @@ source(paste0(working_directory,"/MMM_functions.R"))
 
 
 # Define the variable to include/exclude some columns
-include_phase <- TRUE # Set to TRUE to include "Phase" or FALSE to exclude
-include_sex <- TRUE  #same with sex
+include_phase <- FALSE # Set to TRUE to include "Phase" or FALSE to exclude
+include_sex <- FALSE  #same with sex
 
 #if Phase column doesnt exist in dataframe dont include them
 if (include_phase && !("Phase" %in% colnames(data_filtered))){
@@ -87,7 +87,7 @@ summarized_data <- total_sleep_info_per_change %>%
 # Rename
 overallData <- summarized_data
 
-###################### testing and plotting ############################################################
+###################### execute tests and generate plots ###################################################
 
 # Get the list of columns to plot (excluding non numeric values, which are added manually)
 columnsToPlot <- setdiff(names(overallData), c("AnimalNum", "Group", "Phase", "Batch", "Sex"))
@@ -139,42 +139,25 @@ if (!is.null(allPosthocResults) && length(allPosthocResults) > 0) {
   write.csv(allPosthocResultsDf, file = paste0(sleep_directory,"/posthoc_results_Sleep.csv"), row.names = FALSE)
 }
 
-# Save the plots for Phase1 and Phase2 separately if include_phase is TRUE
-if (include_phase) {
-  for (i in seq_along(allPlots)) {
-    variableName <- allTestResults[[i]]$Variable      
-    
-    if (i %% 2 == 0) {
-      ggsave(filename = paste0(graphs_directory,"/Phase2_", variableName, ".svg"), plot = allPlots[[i]], width = 2.8, height = 3)
-    } else {
-      ggsave(filename = paste0(graphs_directory,"/Phase1_", variableName, ".svg"), plot = allPlots[[i]], width = 2.8, height = 3)
-    }
-  }
-} else {
-  # Save all plots in a consistent manner when include_phase is FALSE
-  for (i in seq_along(allPlots)) {
-    variableName <- allTestResults[[i]]$Variable
-    
-    ggsave(filename = paste0(graphs_directory,"/", variableName, ".svg"), plot = allPlots[[i]], width = 2.8, height = 3)
-  }
+# Save the plots as graphs(number and name of graph-file depends on included factors)
+for (i in seq_along(allPlots)) { #for every plot that is documented
+  #declare variables that are (potentially) included in filename
+  variableName <- allTestResults[[i]]$Variable   
+  ifelse(include_phase, phaseName <- paste0(allTestResults[[i]]$Phase, "_"), phaseName <-  "combined_phase_")    #new variable phaseName to use in the name of the file
+  ifelse(include_sex, sexName <- paste0(allTestResults[[i]]$Sex, "_"), sexName <-  "combined_sex_") 
+     
+  #save in the directory for graphs 
+  #alterate path if extra factors included
+  if(include_phase) factorDir <-  "/include_phase"
+  if(include_sex) factorDir <-  "/include_sex" 
+  if(include_phase && include_sex) factorDir <- "/include_phase_and_sex"
+  if(!include_phase && !include_sex) factorDir <- "/combine_phase_and_sex"
+  ggsave(filename = paste0(graphs_directory, factorDir, "/", phaseName, sexName, variableName, ".svg"), plot = allPlots[[i]], width = 2.8, height = 3)
+  
 }
 
-########################################################################################################
 
-# Initialize an empty list to store plots
-#allPlots <- list()
-
-# Iterate through each variable and phase, and perform tests
-#for (variable in columnsToPlot) {
-#  for (phase in phases) {
-#    for(sex in sexes){
-#      result <- testAndPlotVariable(overallData, variable, phase, sex)
-#      if (!is.null(result)) {
-#        allPlots <- c(allPlots, list(result$plot))
-#      }
-#    }
-#  }
-#}
+############### show plots in R ########################################################################
 
 # Create a grid of plots
 grid.arrange(grobs = allPlots, ncol = 4)
