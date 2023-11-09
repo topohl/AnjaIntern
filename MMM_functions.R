@@ -134,15 +134,8 @@ generatePlot <- function(overallData, variableName, phase, sex) {
 
 ### MATHEMATIC TESTS IN FUNCTIONS: ###
 
-# Function to perform Wilcoxon rank-sum test
-performWilcoxonTest <- function(dataGroup1, dataGroup2) {
-  if (length(dataGroup1) >= 3 && length(dataGroup2) >= 3) {
-    return(wilcox.test(dataGroup1, dataGroup2))
-  } else {
-    return(NULL)
-  }
-}
 
+## parametric
 # Function to perform post hoc pairwise tests for ANOVA
 performPosthocAnova <- function(data, variableName) {
   anovaTest <- aov(as.formula(paste(variableName, "~ Group")), data = data)
@@ -167,7 +160,15 @@ performPosthocKruskal <- function(data, variableName) {
   return(pairwiseResults)
 }
 
-
+# non parametric
+# Function to perform Wilcoxon rank-sum test
+performWilcoxonTest <- function(dataGroup1, dataGroup2) {
+  if (length(dataGroup1) >= 3 && length(dataGroup2) >= 3) {
+    return(wilcox.test(dataGroup1, dataGroup2))
+  } else {
+    return(NULL)
+  }
+}
 
 # Function to perform normality test and appropriate statistical test for each variable and phase
 testAndPlotVariable <- function(data, variableName, phase, sex) {
