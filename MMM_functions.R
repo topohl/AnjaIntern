@@ -51,6 +51,24 @@ process_and_save_xlsx <- function(file_path) {
 
 #################functions for "MMM_sleepAnalysis"##########################
 
+### practical functions: ###
+
+# function that checks if included factors exists as a column in the given data
+# if it does not exist, the factor is not included
+# no return value
+# Input:  the factor to test (character)  
+#         the data (dataframe) on which it is tested and 
+#         the boolean value whether the factor is included or not
+incldeFactorExist <-  function(factor, data, include_factor){
+  if (include_factor && !(factor %in% colnames(data))){
+    cat(paste0("the given data does not contain the column ", factor,", ","include stays FALSE"))
+    include_factor <- FALSE
+  }else{
+    include_factor <- TRUE
+  }
+  
+}
+
 
 ## Function to calculate sleep bouts per phase
 #calculate_total_sleep_info <- function(data) {
@@ -114,7 +132,7 @@ generatePlot <- function(overallData, variableName, phase, sex) {
   return(p)
 }
 
-
+### MATHEMATIC TESTS IN FUNCTIONS: ###
 
 # Function to perform Wilcoxon rank-sum test
 performWilcoxonTest <- function(dataGroup1, dataGroup2) {

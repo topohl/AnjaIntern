@@ -5,45 +5,38 @@ library(cowplot)
 library(tidyr)  # Load tidyr for pivot_wider
 library(dplyr)
 library(rstatix)
-
+library(readxl)
 
 ############## Define constants for file paths, sheet names, specific animals, and group colors ###########
 
-# Define Paths
+# RESULT PATHS
 ##sleep directory path for results 
 sleep_directory <- "S:/Lab_Member/Tobi/Experiments/Exp9_Social-Stress/Analysis/SIS_Analysis/statistics/Sleep"
-##graphs directory path for plots
+##graphs directory path for result plots
 graphs_directory <- "S:/Lab_Member/Tobi/Experiments/Exp9_Social-Stress/Analysis/SIS_Analysis/statistics/sleep/graphs"
+
+# SOURCE PATHS
 ##working directory path
 working_directory <- "S:/Lab_Member/Anja/Git/AnjaIntern"
-
-
 # Include functions
 source(paste0(working_directory,"/MMM_functions.R"))
 
+# Define SUS animals (csv file)
+sus_animals <- readLines(paste0(working_directory,"/sus_animals.csv"))
 
-# Define the variable to include/exclude some columns
-include_phase <- FALSE # Set to TRUE to include "Phase" or FALSE to exclude
-include_sex <- FALSE  #same with sex
 
-#if Phase column doesnt exist in dataframe dont include them
-if (include_phase && !("Phase" %in% colnames(data_filtered))){
-  cat("data_filtered does not contain the column Phase, include_phase stays FALSE")
-  include_phase <- FALSE
-}
-#if Sex column doesnt exist in dataframe dont include them
-if (include_sex && !("Sex" %in% colnames(data_filtered))){
-  cat("data_filtered does not contain the column Sex, include_sex stays FALSE")
-  include_sex <- FALSE
-}
-
-# Define SUS animals
-##csv path for sus animals
-csv_sus_animals <-  paste0(working_directory,"/sus_animals.csv")
-sus_animals <- readLines(csv_sus_animals)
 
 # Define group colors
 groupColors <- c("#1e3791", "#76A2E8", "#F79719")
+
+# Define the factor to include/exclude
+# Set to TRUE to include "Phase" or FALSE to exclude
+# includeFactorExists prohibits the use of a factor that does not exist in data
+include_phase <- incldeFactorExist("Phase", data_filtered, TRUE) 
+include_sex <- incldeFactorExist("Sex", data_filtered, TRUE)  
+
+#include_gender <- incldeFactorExist("Gender", data_filtered, TRUE)
+
 
 
 ################################ Calculating and summarizing #########################################################
