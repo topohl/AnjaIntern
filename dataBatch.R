@@ -3,12 +3,30 @@ library(ggplot2)
 library(dplyr)
 library(openxlsx)
 library(rstatix)
+library(readxl)
+library(cowplot)
 
 # Define constants for file paths, sheet names, specific animals, and group colors
 filePath <- "S:/Lab_Member/Tobi/Experiments/Exp9_Social-Stress/Analysis/SIS_Analysis/E9_Behavior_Data.xlsx"
 sheetName <- "OFT_newSLEAP"
 susAnimals <- c("0001", "0004", "750", "751", "755", "762", "764", "770", "771", "106", "111", "112", "113", "120", "134", "1199", "1200", "1201", "1202", "1203", "1204", "1205", "1206")
 groupColors <- c("#1e3791", "#76A2E8", "#F79719")
+
+##working directory path
+working_directory <- "S:/Lab_Member/Anja/Git/AnjaIntern"
+
+# Include functions
+source(paste0(working_directory,"/MMM_functions.R"))
+
+include_phase <- FALSE # Set to TRUE to include "Phase" or FALSE to exclude
+include_sex <- TRUE
+#declare vectors of the variables which are not always included
+phases <-  "combined phases"
+if(include_phase) phases <-  c("Active", "Inactive")
+sexes <-  "combined sexes"
+if(include_sex) sexes <- c("male", "female")
+
+###########################################################################
 
 # Read data from the Excel file
 overallData <- read_excel(filePath, sheet = sheetName)
@@ -17,6 +35,9 @@ overallData <- read_excel(filePath, sheet = sheetName)
 overallData <- overallData %>%
   mutate(Group = if_else(ID %in% susAnimals, "SUS",
                          if_else(Group == "SIS", "RES", Group)))
+
+##########################################################################################
+if(FALSE){
 
 # Function to generate plots for each variable and sex
 generatePlot <- function(data, variableName, sex) {
@@ -174,6 +195,8 @@ testAndPlotVariable <- function(data, variableName, sex) {
     return(list(testResults = testResults, plot = p, posthocResults = testResultsDf))
   }
 }
+}
+##############################################################################################################################
 
 # Get the list of columns to plot (excluding "ID", "Group", "Sex")
 columnsToPlot <- setdiff(names(overallData), c("ID", "Group", "Sex", "Batch"))
@@ -186,7 +209,7 @@ allPosthocResults <- list()
 # Iterate through each variable and sex, and perform tests
 for (variable in columnsToPlot) {
   for (sex in c("m", "f")) {
-    result <- testAndPlotVariable(overallData, variable, sex)
+    result <- testAndPlotVariable(overallData, variable, phases, sex)
     if (!is.null(result)) {
       if (is.null(result$posthocResults)) {
         allTestResults <- c(allTestResults, list(result$testResults))
@@ -202,13 +225,15 @@ for (variable in columnsToPlot) {
 # Convert the list of test results to a data frame
 allTestResultsDf <- bind_rows(allTestResults)
 
+###################################################################### saving ###################################################################################################
+testpath <- "S:/Lab_Member/Anja/test"
 # Save the test results data frame to a CSV file
-write.csv(allTestResultsDf, file = paste0("S:/Lab_Member/Tobi/Experiments/Exp9_Social-Stress/Analysis/SIS_Analysis/statistics/test_results_", sheetName, ".csv"), row.names = FALSE)
+write.csv(allTestResultsDf, file = paste0(testpath, "/test_results_", sheetName, ".csv"), row.names = FALSE)
 
 # Save the post hoc results to a CSV file
 if (!is.null(allPosthocResults) && length(allPosthocResults) > 0) {
   allPosthocResultsDf <- bind_rows(allPosthocResults)
-  write.csv(allPosthocResultsDf, file = paste0("S:/Lab_Member/Tobi/Experiments/Exp9_Social-Stress/Analysis/SIS_Analysis/statistics/posthoc_results_", sheetName, ".csv"), row.names = FALSE)
+  write.csv(allPosthocResultsDf, file = paste0(testpath, "/posthoc_results_", sheetName, ".csv"), row.names = FALSE)
 }
 
 # Save the plots for males and females separately
@@ -216,8 +241,8 @@ for (i in seq_along(allPlots)) {
   variableName <- allTestResults[[i]]$Variable
   
   if (i %% 2 == 0) {
-    ggsave(filename = paste0("S:/Lab_Member/Tobi/Experiments/Exp9_Social-Stress/Analysis/SIS_Analysis/statistics/female_", variableName, ".svg"), plot = allPlots[[i]], width = 2.8, height = 3)
+    ggsave(filename = paste0(testpath, "/female_", variableName, ".svg"), plot = allPlots[[i]], width = 2.8, height = 3)
   } else {
-    ggsave(filename = paste0("S:/Lab_Member/Tobi/Experiments/Exp9_Social-Stress/Analysis/SIS_Analysis/statistics/male_", variableName, ".svg"), plot = allPlots[[i]], width = 2.8, height = 3)
+    ggsave(filename = paste0(testpath, "/male_", variableName, ".svg"), plot = allPlots[[i]], width = 2.8, height = 3)
   }
 }
