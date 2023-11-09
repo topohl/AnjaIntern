@@ -97,7 +97,7 @@ if(include_phase) phases <-  c("Active", "Inactive")
 sexes <-  "combined sexes"
 if(include_sex) sexes <- c("male", "female")
 
-# Iterate through each variable and phase, and perform tests
+# Iterate through each variable and factor, and perform tests
 for (variable in columnsToPlot) {
   for (phase in phases) {
     for(sex in sexes){
@@ -119,11 +119,12 @@ for (variable in columnsToPlot) {
   }
 }
 
-# Convert the list of test results to a data frame
-allTestResultsDf <- bind_rows(allTestResults)
+
 
 ####################### saving the results #############################################################
 
+# Convert the list of test results to a data frame
+allTestResultsDf <- bind_rows(allTestResults)
 # Save the test results data frame to a CSV file
 write.csv(allTestResultsDf, file = paste0(sleep_directory,"/test_results_Sleep.csv"), row.names = FALSE)
 # Save the post hoc results to a CSV file
@@ -132,22 +133,8 @@ if (!is.null(allPosthocResults) && length(allPosthocResults) > 0) {
   write.csv(allPosthocResultsDf, file = paste0(sleep_directory,"/posthoc_results_Sleep.csv"), row.names = FALSE)
 }
 
-# Save the plots as graphs(number and name of graph-file depends on included factors)
-for (i in seq_along(allPlots)) { #for every plot that is documented
-  #declare variables that are (potentially) included in filename
-  variableName <- allTestResults[[i]]$Variable   
-  ifelse(include_phase, phaseName <- paste0(allTestResults[[i]]$Phase, "_"), phaseName <-  "combined_phase_")    #new variable phaseName to use in the name of the file
-  ifelse(include_sex, sexName <- paste0(allTestResults[[i]]$Sex, "_"), sexName <-  "combined_sex_") 
-     
-  #save in the directory for graphs 
-  #alterate path if extra factors included
-  if(include_phase) factorDir <-  "/include_phase"
-  if(include_sex) factorDir <-  "/include_sex" 
-  if(include_phase && include_sex) factorDir <- "/include_phase_and_sex"
-  if(!include_phase && !include_sex) factorDir <- "/combine_phase_and_sex"
-  ggsave(filename = paste0(graphs_directory, factorDir, "/", phaseName, sexName, variableName, ".svg"), plot = allPlots[[i]], width = 2.8, height = 3)
-  
-}
+#safe the plots
+savePlotsInDir(allTestResults, allPlots, graphs_directory, ".svg")
 
 
 ############### show plots in R ########################################################################
