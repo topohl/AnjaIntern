@@ -174,11 +174,7 @@ performWilcoxonTest <- function(dataGroup1, dataGroup2) {
 
 # Function to perform normality test and appropriate statistical test for each variable and phase
 testAndPlotVariable <- function(data, variableName, phase, sex) {
-  
-  cat("\n", variableName, "\n")
-  cat(phase, "\n")
-  cat(sex, "\n")
-  
+
   #filtering specific phase or sex if needed 
   filteredData <- data %>%
     filter(if (include_phase) Phase == phase else TRUE) %>%   # Include/exclude "Phase" based on the variable
@@ -186,15 +182,12 @@ testAndPlotVariable <- function(data, variableName, phase, sex) {
   
   # save unique group names
   uniqueGroups <- unique(filteredData$Group)  #SUS,RES,CON...
-  cat(uniqueGroups, "\n")
   # number of different groups in data
   numGroups <- length(uniqueGroups)
-  cat(numGroups, "\n")
   
   # Check if the variable is numeric (if not, return Null)
   if (is.numeric(filteredData[[variableName]])) {
     if (numGroups == 2) {
-      cat("numGroups=2\n")
       group1 <- uniqueGroups[1]
       group2 <- uniqueGroups[2]
       
@@ -227,7 +220,6 @@ testAndPlotVariable <- function(data, variableName, phase, sex) {
         }
       }
     } else {  # numGroups /= 2
-      cat("numGroups/=2\n")
       ## NORMALIZATION
       # normalize group CON and RES with Shapiro-Wilk Normality Test
       conNorm <- shapiro.test(filteredData[[variableName]][filteredData$Group == "CON"])
@@ -240,7 +232,6 @@ testAndPlotVariable <- function(data, variableName, phase, sex) {
       } else {
         susNorm <- list(p.value = 1)
       }
-      cat("middle\n")
       #if one of the p values of the normalizations is empty, return NULL
       if (is.na(conNorm$p.value) || is.na(resNorm$p.value) || is.na(susNorm$p.value)) {
         return(NULL)
@@ -261,22 +252,17 @@ testAndPlotVariable <- function(data, variableName, phase, sex) {
       posthocResultsDf <- data.frame()
       
       ## ANOVA
-      cat("ANOVA\n")
       if (numGroups > 2) {
-        cat("numGroups>2\n")
         #every p value has to be not significant(>=0,05)
         if (conNorm$p.value >= 0.05 && resNorm$p.value >= 0.05 && susNorm$p.value >= 0.05) {
-          cat("pvalues are >=0.05\n")
           anovaTest <- aov(as.formula(paste(variableName, "~ Group")), data = filteredData)
           testResults$Test <- "ANOVA"
           testResults$P_Value <- summary(anovaTest)[[1]][["Pr(>F)"]][1]
           testResults$Significance_Level <- sprintf("%.3f", testResults$P_Value)
           #posthoc for ANOVA
           posthocResultsDf <- performPosthocAnova(filteredData, variableName)
-        } else {#Kruskal WallisS
-          cat("pvalues are <0.05\n")
+        } else {#Kruskal Wallis
           kruskalTest <- kruskal.test(as.formula(paste(variableName, "~ Group")), data = filteredData)
-          cat("kruskaltest done\n")
           testResults$Test <- "Kruskal-Wallis"
           testResults$P_Value <- kruskalTest$p.value
           testResults$Significance_Level <- sprintf("%.3f", p.adjust(testResults$P_Value, method = "BH"))
@@ -285,7 +271,6 @@ testAndPlotVariable <- function(data, variableName, phase, sex) {
         }
         
         if (!is.null(posthocResultsDf) && ncol(posthocResultsDf) > 0) {
-          cat("xtra case\n")
           if (identical(names(testResultsDf), names(posthocResultsDf))) {
             testResultsDf <- bind_rows(testResultsDf, posthocResultsDf)
           } else {
@@ -295,7 +280,6 @@ testAndPlotVariable <- function(data, variableName, phase, sex) {
       }
       
       #generate plots in p for return
-      cat("generatePlot\n")
       p <- generatePlot(filteredData, variableName, phase, sex)
       
       return(list(testResults = testResults, plot = p, posthocResults = testResultsDf))
