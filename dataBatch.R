@@ -1,3 +1,14 @@
+### dataBatch ###
+# data contains differences between male and female mice in different actions
+# directory path has to contain the sus_animals and the function sheet
+# structure of file:
+# - important definitions
+# - code reads data out of excel files
+# - necessary modifications for tests
+# - test running, generating results in csv and plots
+# - saving results
+
+
 # Load libraries
 library(ggplot2)
 library(dplyr)
@@ -7,196 +18,46 @@ library(readxl)
 library(cowplot)
 
 # Define constants for file paths, sheet names, specific animals, and group colors
+
+# SOURCE PATHS
 filePath <- "S:/Lab_Member/Tobi/Experiments/Exp9_Social-Stress/Analysis/SIS_Analysis/E9_Behavior_Data.xlsx"
 sheetName <- "OFT_newSLEAP"
-groupColors <- c("#1e3791", "#76A2E8", "#F79719")
-
 ##working directory path
 working_directory <- "S:/Lab_Member/Anja/Git/AnjaIntern"
-susAnimals <- c(readLines(paste0(working_directory,"/sus_animals.csv")))
+
+#RESULT PATHS
+saveResultPath <- "S:/Lab_Member/Tobi/Experiments/Exp9_Social-Stress/Analysis/SIS_Analysis/statistics"
 
 # Include functions
 source(paste0(working_directory,"/MMM_functions.R"))
 
-include_phase <- FALSE # Set to TRUE to include "Phase" or FALSE to exclude
-include_sex <- TRUE
+# Read data from the Excel file
+overallData <- read_excel(filePath, sheet = sheetName)
+
+# Define SUS animals (csv file)
+susAnimals <- c(readLines(paste0(working_directory,"/sus_animals.csv")))
+# Define the factor to include/exclude
+# Set to TRUE to include "Phase" or FALSE to exclude
+include_phase <- incldeFactorExist("Phase", overallData, FALSE) 
+include_sex <- incldeFactorExist("Sex", overallData, TRUE)
+
+groupColors <- c("#1e3791", "#76A2E8", "#F79719")
+
 #declare vectors of the variables which are not always included
 phases <-  "combined phases"
 if(include_phase) phases <-  c("Active", "Inactive")
 sexes <-  "combined sexes"
 if(include_sex) sexes <- c("male", "female")
 
-###########################################################################
+########################### modify data ##########################################################################################
 
-# Read data from the Excel file
-overallData <- read_excel(filePath, sheet = sheetName)
 
 # Modify group assignment for specific animals
 overallData <- overallData %>%
   mutate(Group = if_else(ID %in% susAnimals, "SUS",
                          if_else(Group == "SIS", "RES", Group)))
 
-##########################################################################################
-if(FALSE){
-
-# Function to generate plots for each variable and sex
-generatePlot <- function(data, variableName, sex) {
-  filteredData <- data %>%
-    filter(Sex == sex)
-  
-  p <- ggplot(filteredData, aes(Group, .data[[variableName]], color = Group)) +
-    # Customize plot aesthetics and labels
-    scale_x_discrete(name = NULL, expand = c(0.3, 0.1)) + 
-    scale_y_continuous(expand = c(0.1, 0.1)) +
-    geom_jitter(aes(fill = Group), size = 4, alpha = 0.7, width = 0.2, shape = 16, na.rm = TRUE) +
-    stat_summary(
-      fun.min = function(z) {quantile(z, 0.25)},
-      fun.max = function(z) {quantile(z, 0.75)},
-      fun = median,
-      color = "black",
-      size = 0.8,
-      shape = 16,
-      na.rm = TRUE
-    ) +
-    labs(title = bquote(~bold(.(variableName))),
-         subtitle = paste("(", sex, ")", sep = ""),
-         caption = "",
-         x = NULL,
-         y = "z score [a.u.]") +
-    scale_color_manual(name = NULL, values = groupColors) +
-    scale_fill_manual(name = NULL, values = groupColors) +
-    theme_minimal_hgrid(12, rel_small = 1) +
-    theme(plot.title = element_text(hjust = 0.5, face = "plain"),
-          plot.subtitle = element_text(hjust = 0.5, size = 10, face = "plain"),
-          legend.position = "none",
-          axis.title.x = element_blank(),
-          axis.text.x = element_text(),
-          axis.ticks.x = element_blank())
-  
-  return(p)
-}
-
-# Function to perform Wilcoxon rank-sum test
-performWilcoxonTest <- function(dataGroup1, dataGroup2) {
-  if (length(dataGroup1) >= 3 && length(dataGroup2) >= 3) {
-    return(wilcox.test(dataGroup1, dataGroup2))
-  } else {
-    return(NULL)
-  }
-}
-
-# Function to perform post hoc pairwise tests for ANOVA
-performPosthocAnova <- function(data, variableName) {
-  anovaTest <- aov(as.formula(paste(variableName, "~ Group")), data = data)
-  pairwiseResults <- pairwise_t_test(data, formula = as.formula(paste(variableName, "~ Group")),
-                                     p.adjust.method = "bonferroni")
-  pairwiseResults$GroupComparison <- paste(pairwiseResults$group1, "vs.", pairwiseResults$group2)
-  return(pairwiseResults)
-}
-
-# Function to perform post hoc pairwise tests for Kruskal-Wallis
-performPosthocKruskal <- function(data, variableName) {
-  kruskalTest <- kruskal.test(as.formula(paste(variableName, "~ Group")), data = data)
-  pairwiseResults <- dunn_test(data, formula = as.formula(paste(variableName, "~ Group")),
-                               p.adjust.method = "holm")
-  pairwiseResults$GroupComparison <- paste(pairwiseResults$group1, "vs.", pairwiseResults$group2)
-  return(pairwiseResults)
-}
-
-# Function to perform normality test and appropriate statistical test for each variable and sex
-testAndPlotVariable <- function(data, variableName, sex) {
-  filteredData <- data %>%
-    filter(Sex == sex)
-  
-  uniqueGroups <- unique(filteredData$Group)
-  numGroups <- length(uniqueGroups)
-  
-  if (numGroups == 2) {
-    group1 <- uniqueGroups[1]
-    group2 <- uniqueGroups[2]
-    
-    dataGroup1 <- filteredData[[variableName]][filteredData$Group == group1]
-    dataGroup2 <- filteredData[[variableName]][filteredData$Group == group2]
-    
-    if (sum(!is.na(dataGroup1)) >= 3 && sum(!is.na(dataGroup2)) >= 3) {
-      wilcoxRes <- performWilcoxonTest(dataGroup1, dataGroup2)
-      
-      if (!is.null(wilcoxRes)) {
-        testResults <- list(
-          Variable = variableName,
-          Sex = sex,
-          Test = "Wilcoxon rank-sum test",
-          CON_Normality = NA,
-          RES_Normality = NA,
-          SUS_Normality = NA,
-          P_Value = wilcoxRes$p.value,
-          Significance_Level = sprintf("%.3f", wilcoxRes$p.value)
-        )
-        
-        p <- generatePlot(filteredData, variableName, sex)
-        
-        return(list(testResults = testResults, plot = p, posthocResults = NULL))
-      }
-    }
-  } else {
-    conNorm <- shapiro.test(filteredData[[variableName]][filteredData$Group == "CON"])
-    resNorm <- shapiro.test(filteredData[[variableName]][filteredData$Group == "RES"])
-    
-    susGroupExists <- any(filteredData$Group == "SUS")
-    if (susGroupExists) {
-      susNorm <- shapiro.test(filteredData[[variableName]][filteredData$Group == "SUS"])
-    } else {
-      susNorm <- list(p.value = 1)
-    }
-    
-    if (is.na(conNorm$p.value) || is.na(resNorm$p.value) || is.na(susNorm$p.value)) {
-      return(NULL)
-    }
-    
-    testResults <- list(
-      Variable = variableName,
-      Sex = sex,
-      CON_Normality = conNorm$p.value,
-      RES_Normality = resNorm$p.value,
-      SUS_Normality = susNorm$p.value
-    )
-    
-    testResultsDf <- data.frame()
-    posthocResultsDf <- data.frame()
-    
-    if (numGroups > 2) {
-      if (conNorm$p.value >= 0.05 && resNorm$p.value >= 0.05 && susNorm$p.value >= 0.05) {
-        anovaTest <- aov(as.formula(paste(variableName, "~ Group")), data = filteredData)
-        testResults$Test <- "ANOVA"
-        testResults$P_Value <- summary(anovaTest)[[1]][["Pr(>F)"]][1]
-        testResults$Significance_Level <- sprintf("%.3f", testResults$P_Value)
-        
-        posthocResultsDf <- performPosthocAnova(filteredData, variableName)
-      } else {
-        kruskalTest <- kruskal.test(as.formula(paste(variableName, "~ Group")), data = filteredData)
-        testResults$Test <- "Kruskal-Wallis"
-        testResults$P_Value <- kruskalTest$p.value
-        testResults$Significance_Level <- sprintf("%.3f", p.adjust(testResults$P_Value, method = "BH"))
-        
-        posthocResultsDf <- performPosthocKruskal(filteredData, variableName)
-      }
-      
-      if (!is.null(posthocResultsDf) && ncol(posthocResultsDf) > 0) {
-        if (identical(names(testResultsDf), names(posthocResultsDf))) {
-          testResultsDf <- bind_rows(testResultsDf, posthocResultsDf)
-        } else {
-          testResultsDf <- plyr::rbind.fill(testResultsDf, posthocResultsDf)
-        }
-      }
-    }
-    
-    p <- generatePlot(filteredData, variableName, sex)
-    
-    return(list(testResults = testResults, plot = p, posthocResults = testResultsDf))
-  }
-}
-}
-##############################################################################################################################
+########################### execute tests and generate plots ############################################################################
 
 # Get the list of columns to plot (excluding "ID", "Group", "Sex")
 columnsToPlot <- setdiff(names(overallData), c("ID", "Group", "Sex", "Batch"))
@@ -206,26 +67,40 @@ allTestResults <- list()
 allPlots <- list()
 allPosthocResults <- list()
 
-# Iterate through each variable and sex, and perform tests
+#declare vectors of the variables which are not always included
+phases <-  "combined phases"
+if(include_phase) phases <-  c("Active", "Inactive")
+sexes <-  "combined sexes"
+if(include_sex) sexes <- c("male", "female")
+
+# Iterate through each variable and factor, and perform tests
 for (variable in columnsToPlot) {
-  for (sex in c("m", "f")) {
-    result <- testAndPlotVariable(overallData, variable, phases, sex)
-    if (!is.null(result)) {
-      if (is.null(result$posthocResults)) {
-        allTestResults <- c(allTestResults, list(result$testResults))
-      } else {
-        allTestResults <- c(allTestResults, list(result$testResults))
-        allPosthocResults <- c(allPosthocResults, list(result$posthocResults))
+  for (phase in phases) {
+    for(sex in sexes){
+      result <- testAndPlotVariable(overallData, variable, phase, sex)
+      # add result-list(containing the columns testResults, plot, posthocResults) to other fitting list
+      if (!is.null(result)) {
+        # posthocResults is always NULL for the Wilcoxon test
+        if (is.null(result$posthocResults)) {
+          allTestResults <- c(allTestResults, list(result$testResults))
+        } else {
+          allTestResults <- c(allTestResults, list(result$testResults))
+          allPosthocResults <- c(allPosthocResults, list(result$posthocResults))
+        }
+        #add the plot
+        allPlots <- c(allPlots, list(result$plot))
       }
-      allPlots <- c(allPlots, list(result$plot))
+      
     }
   }
 }
 
+
+############################# saving results ##############################################################################################
+
 # Convert the list of test results to a data frame
 allTestResultsDf <- bind_rows(allTestResults)
 
-###################################################################### saving ###################################################################################################
 testpath <- "S:/Lab_Member/Anja/test"
 # Save the test results data frame to a CSV file
 write.csv(allTestResultsDf, file = paste0(testpath, "/test_results_", sheetName, ".csv"), row.names = FALSE)
@@ -236,6 +111,10 @@ if (!is.null(allPosthocResults) && length(allPosthocResults) > 0) {
   write.csv(allPosthocResultsDf, file = paste0(testpath, "/posthoc_results_", sheetName, ".csv"), row.names = FALSE)
 }
 
+#safe the plots
+savePlotsInDir(allTestResults, allPlots, testpath, ".svg")
+
+if(FALSE){
 # Save the plots for males and females separately
 for (i in seq_along(allPlots)) {
   variableName <- allTestResults[[i]]$Variable
@@ -245,4 +124,5 @@ for (i in seq_along(allPlots)) {
   } else {
     ggsave(filename = paste0(testpath, "/male_", variableName, ".svg"), plot = allPlots[[i]], width = 2.8, height = 3)
   }
+}
 }
