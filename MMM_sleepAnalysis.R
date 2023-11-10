@@ -32,7 +32,7 @@ groupColors <- c("#1e3791", "#76A2E8", "#F79719")
 # Define the factor to include/exclude
 # Set to TRUE to include "Phase" or FALSE to exclude
 # includeFactorExists prohibits the use of a factor that does not exist in data
-include_phase <- incldeFactorExist("Phase", data_filtered, TRUE) 
+include_phase <- incldeFactorExist("Phase", data_filtered, FALSE) 
 include_sex <- incldeFactorExist("Sex", data_filtered, TRUE)  
 
 #include_gender <- incldeFactorExist("Gender", data_filtered, TRUE)
@@ -95,9 +95,9 @@ allPosthocResults <- list()
 
 
 #declare vectors of the variables which are not always included
-phases <-  "combined phases"
+phases <-  " "
 if(include_phase) phases <-  c("Active", "Inactive")
-sexes <-  "combined sexes"
+sexes <-  " "
 if(include_sex) sexes <- c("male", "female")
 
 # Iterate through each variable and factor, and perform tests

@@ -118,7 +118,7 @@ generatePlot <- function(overallData, variableName, phase, sex) {
       na.rm = TRUE
     ) +
     labs(title = bquote(~bold(.(variableName))),
-         subtitle = paste("(", phase, ", ", sex, ")", sep = ""),
+         subtitle = paste("(", phase, " ", sex, ")", sep = ""),
          caption = "",
          x = NULL,
          y = "z score [a.u.]") +
@@ -301,15 +301,16 @@ savePlotsInDir <- function(allTestResults, allPlots, target_directory, fileType)
   for (i in seq_along(allPlots)) { #for every plot that is documented
     #declare variables that are (potentially) included in filename
     variableName <- allTestResults[[i]]$Variable 
-    ifelse(include_phase, phaseName <- paste0(allTestResults[[i]]$Phase, "_"), phaseName <-  "combined_phase_")    #new variable phaseName to use in the name of the file
-    ifelse(include_sex, sexName <- paste0(allTestResults[[i]]$Sex, "_"), sexName <-  "combined_sex_") 
+    ifelse(include_phase, phaseName <- paste0(allTestResults[[i]]$Phase, "_"), phaseName <-  "")    #new variable phaseName to use in the name of the file
+    ifelse(include_sex, sexName <- paste0(allTestResults[[i]]$Sex, "_"), sexName <-  "") 
+
     
     #save in the directory for graphs 
     #alterate path if extra factors included
     if(include_phase) factorDir <-  "/include_phase"
     if(include_sex) factorDir <-  "/include_sex" 
     if(include_phase && include_sex) factorDir <- "/include_phase_and_sex"
-    if(!include_phase && !include_sex) factorDir <- "/combine_phase_and_sex"
+    if(!include_phase && !include_sex) factorDir <- ""
     ggsave(filename = paste0(target_directory, factorDir, "/", phaseName, sexName, variableName, fileType), plot = allPlots[[i]], width = 2.8, height = 3)
     
   }

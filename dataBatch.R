@@ -68,9 +68,9 @@ allPlots <- list()
 allPosthocResults <- list()
 
 #declare vectors of the variables which are not always included
-phases <-  "combined phases"
+phases <-  " "
 if(include_phase) phases <-  c("Active", "Inactive")
-sexes <-  "combined sexes"
+sexes <-  " "
 if(include_sex) sexes <- c("m", "f")
 
 # Iterate through each variable and factor, and perform tests
