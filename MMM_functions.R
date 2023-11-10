@@ -60,15 +60,16 @@ process_and_save_xlsx <- function(file_path) {
 #         the data (dataframe) on which it is tested and 
 #         the boolean value whether the factor is included or not
 incldeFactorExist <-  function(factor, data, include_factor){
-  if (include_factor && !(factor %in% colnames(data))){
-    cat(paste0("the given data does not contain the column ", factor,", ","include stays FALSE"))
-    include_factor <- FALSE
-  }else{
+  if (include_factor && (factor %in% colnames(data))){
     include_factor <- TRUE
+  }else{
+    if(include_factor && !(factor %in% colnames(data))){
+      cat(paste0("the given data does not contain the column ", factor,", ","include stays FALSE"))
+    }
+    include_factor <- FALSE
   }
   
 }
-
 
 
 
