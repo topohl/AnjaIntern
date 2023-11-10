@@ -136,7 +136,7 @@ if (!is.null(allPosthocResults) && length(allPosthocResults) > 0) {
   write.csv(allPosthocResultsDf, file = paste0(sleep_directory,"/posthoc_results_Sleep.csv"), row.names = FALSE)
 }
 
-#safe the plots
+#save the plots
 savePlotsInDir(allTestResults, allPlots, graphs_directory, ".svg")
 
 
