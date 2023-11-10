@@ -9,11 +9,11 @@ library(cowplot)
 # Define constants for file paths, sheet names, specific animals, and group colors
 filePath <- "S:/Lab_Member/Tobi/Experiments/Exp9_Social-Stress/Analysis/SIS_Analysis/E9_Behavior_Data.xlsx"
 sheetName <- "OFT_newSLEAP"
-susAnimals <- c("0001", "0004", "750", "751", "755", "762", "764", "770", "771", "106", "111", "112", "113", "120", "134", "1199", "1200", "1201", "1202", "1203", "1204", "1205", "1206")
 groupColors <- c("#1e3791", "#76A2E8", "#F79719")
 
 ##working directory path
 working_directory <- "S:/Lab_Member/Anja/Git/AnjaIntern"
+susAnimals <- c(readLines(paste0(working_directory,"/sus_animals.csv")))
 
 # Include functions
 source(paste0(working_directory,"/MMM_functions.R"))
