@@ -101,28 +101,15 @@ for (variable in columnsToPlot) {
 # Convert the list of test results to a data frame
 allTestResultsDf <- bind_rows(allTestResults)
 
-testpath <- "S:/Lab_Member/Anja/test"
+
 # Save the test results data frame to a CSV file
-write.csv(allTestResultsDf, file = paste0(testpath, "/test_results_", sheetName, ".csv"), row.names = FALSE)
+write.csv(allTestResultsDf, file = paste0(saveResultPath, "/test_results_", sheetName, ".csv"), row.names = FALSE)
 
 # Save the post hoc results to a CSV file
 if (!is.null(allPosthocResults) && length(allPosthocResults) > 0) {
   allPosthocResultsDf <- bind_rows(allPosthocResults)
-  write.csv(allPosthocResultsDf, file = paste0(testpath, "/posthoc_results_", sheetName, ".csv"), row.names = FALSE)
+  write.csv(allPosthocResultsDf, file = paste0(saveResultPath, "/posthoc_results_", sheetName, ".csv"), row.names = FALSE)
 }
 
 #save the plots
-savePlotsInDir(allTestResults, allPlots, testpath, ".svg")
-
-if(FALSE){
-# Save the plots for males and females separately
-for (i in seq_along(allPlots)) {
-  variableName <- allTestResults[[i]]$Variable
-  
-  if (i %% 2 == 0) {
-    ggsave(filename = paste0(testpath, "/female_", variableName, ".svg"), plot = allPlots[[i]], width = 2.8, height = 3)
-  } else {
-    ggsave(filename = paste0(testpath, "/male_", variableName, ".svg"), plot = allPlots[[i]], width = 2.8, height = 3)
-  }
-}
-}
+savePlotsInDir(allTestResults, allPlots, saveResultPath, ".svg")
