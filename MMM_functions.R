@@ -69,48 +69,6 @@ incldeFactorExist <-  function(factor, data, include_factor){
   
 }
 
-# function that is the framework for testAndPlotVariable
-# initializes empty lists
-# looks at the included factors, includes them if needed
-# 
-# Input:  columnsToPlot(vector of strings)
-runTestsAndPlots <-  function(columnsToPlot){
-  # Initialize empty lists
-  allTestResults <- list()
-  allPlots <- list()
-  allPosthocResults <- list()
-  
-  
-  #declare vectors of the variables which are not always included
-  phases <-  "combined phases"
-  if(include_phase) phases <-  c("Active", "Inactive")
-  sexes <-  "combined sexes"
-  if(include_sex) sexes <- c("male", "female")
-  
-  # Iterate through each variable and factor, and perform tests
-  for (variable in columnsToPlot) {
-    for (phase in phases) {
-      for(sex in sexes){
-        result <- testAndPlotVariable(overallData, variable, phase, sex)
-        # add result-list(containing the columns testResults, plot, posthocResults) to other fitting list
-        if (!is.null(result)) {
-          # posthocResults is always NULL for the Wilcoxon test
-          if (is.null(result$posthocResults)) {
-            allTestResults <- c(allTestResults, list(result$testResults))
-          } else {
-            allTestResults <- c(allTestResults, list(result$testResults))
-            allPosthocResults <- c(allPosthocResults, list(result$posthocResults))
-          }
-          #add the plot
-          allPlots <- c(allPlots, list(result$plot))
-        }
-        
-      }
-    }
-  }
-}
-
-
 
 
 

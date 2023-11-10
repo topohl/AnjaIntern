@@ -85,10 +85,43 @@ overallData <- summarized_data
 # Get the list of columns to plot (excluding non numeric values, which are added manually)
 columnsToPlot <- setdiff(names(overallData), c("AnimalNum", "Group", "Phase", "Batch", "Sex"))
 
-# run statistic tests on given data with wanted colums
+# run statistic tests on given data with wanted colums>
 #generates three result dataframes
-#???!!!dataframes als return??
-runTestsAndPlots(columnsToPlot)
+
+# Initialize empty lists
+allTestResults <- list()
+allPlots <- list()
+allPosthocResults <- list()
+
+
+#declare vectors of the variables which are not always included
+phases <-  "combined phases"
+if(include_phase) phases <-  c("Active", "Inactive")
+sexes <-  "combined sexes"
+if(include_sex) sexes <- c("male", "female")
+
+# Iterate through each variable and factor, and perform tests
+for (variable in columnsToPlot) {
+  for (phase in phases) {
+    for(sex in sexes){
+      result <- testAndPlotVariable(overallData, variable, phase, sex)
+      # add result-list(containing the columns testResults, plot, posthocResults) to other fitting list
+      if (!is.null(result)) {
+        # posthocResults is always NULL for the Wilcoxon test
+        if (is.null(result$posthocResults)) {
+          allTestResults <- c(allTestResults, list(result$testResults))
+        } else {
+          allTestResults <- c(allTestResults, list(result$testResults))
+          allPosthocResults <- c(allPosthocResults, list(result$posthocResults))
+        }
+        #add the plot
+        allPlots <- c(allPlots, list(result$plot))
+      }
+      
+    }
+  }
+}
+
 
 
 ####################### saving the results #############################################################
