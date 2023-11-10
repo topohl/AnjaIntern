@@ -175,12 +175,11 @@ performWilcoxonTest <- function(dataGroup1, dataGroup2) {
 
 # Function to perform normality test and appropriate statistical test for each variable and phase
 testAndPlotVariable <- function(data, variableName, phase, sex) {
-
   #filtering specific phase or sex if needed 
   filteredData <- data %>%
-    filter(if (include_phase) Phase == phase else TRUE) %>%   # Include/exclude "Phase" based on the variable
-    filter(if (include_sex) Sex == sex else TRUE)            # Include/exclude "Sex" based on the variable
-  
+    filter(if(include_phase) Phase == phase else TRUE) %>%   # Include/exclude "Phase" based on the variable
+    filter(if(include_sex) Sex == sex else TRUE)            # Include/exclude "Sex" based on the variable
+
   # save unique group names
   uniqueGroups <- unique(filteredData$Group)  #SUS,RES,CON...
   # number of different groups in data
