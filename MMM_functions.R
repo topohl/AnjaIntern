@@ -22,9 +22,9 @@ process_file <- function(file_path) {
 male_or_female <- function(batch){
   batch_name <-  str_extract(batch, "B\\d")
   if(batch_name == "B1" || batch_name == "B2"){
-    return("male")
+    return("m")
   }else{ #batch_name == "B3" || batch_name == "B4"
-    return("female")
+    return("f")
   }
 }
   

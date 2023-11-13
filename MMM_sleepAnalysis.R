@@ -98,7 +98,7 @@ allPosthocResults <- list()
 phases <-  " "
 if(include_phase) phases <-  c("Active", "Inactive")
 sexes <-  " "
-if(include_sex) sexes <- c("male", "female")
+if(include_sex) sexes <- c("m", "f")
 
 # Iterate through each variable and factor, and perform tests
 for (variable in columnsToPlot) {
