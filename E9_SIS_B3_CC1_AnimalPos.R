@@ -28,11 +28,48 @@ overallData$DateTime <- as.POSIXct(overallData$DateTime, format = "%d.%m.%Y %H:%
 # separate date and time into extra columns
 overallData[c('Date', 'Time')] <- str_split_fixed(overallData$DateTime, ' ', 2)
 
+# separate Animal into his ID an his system
+overallData[c('AnimalID', 'System')] <- str_split_fixed(overallData$Animal, '_', 2)
 
+
+#################### test ###########################################################
+library(dplyr)
+
+find_id <- function(x_Pos, y_Pos, lookup_tibble) {
+  result <- lookup_tibble %>%
+    filter(xPos == x_Pos, yPos == y_Pos) %>%
+    select(PositionID)
+  
+  if (nrow(result) > 0) {
+    return(result$PositionID)
+  } else {
+    return(NA) # Return NA if no match found
+  }
+}
+
+#Positions
+positions <- select(overallData, c(xPos,yPos))
+unique_positions <- unique(positions)
+Positions_tibble <- tibble(PositionID = c(1:length(unique_positions$xPos)), xPos = select(unique_positions, c(xPos)), yPos = select(unique_positions, c(yPos)))
+
+# Assuming tibble1 contains ID, x, and y columns and tibble2 contains x and y columns
+overallData_ids <- overallData %>% rowwise() %>%
+  mutate(PositionID = find_id(xPos, yPos, Positions_tibble))
+
+
+print(names(Positions_tibble))
+print(Positions_tibble$xPos)
+sorted <- Positions_tibble%>%
+  filter(xPos==0, yPos==116)
+print(sorted)
+
+find_id(0, 116, Positions_tibble)
+##############################################################################
 
 # sort columns
-overallData <- overallData[c('Date', 'Time', 'Animal', 'xPos', 'yPos')]
+overallData_final <- overallData_ids[c('Date', 'Time', 'AnimalID', 'System', 'PositionID')]
 
+########################################################################################################maybe not necessary
 # 2NF m&3NF
 ### create extra tibbles out of overallData: ###
 # Dates
@@ -55,13 +92,13 @@ Animals_tibble <- tibble(AnimalID = c(1:length(unique_animals)), Animal = unique
 #Positions
 positions <- select(overallData, c(xPos,yPos))
 unique_positions <- unique(positions)
-Positions_tibble <- tibble(PositionID = c(1:length(unique_positions$xPos)), xPos = unique_positions[1], yPos = unique_positions[2])
+Positions_tibble <- tibble(PositionID = c(1:length(unique_positions$xPos)), xPos = select(unique_positions, c(xPos)), yPos = select(unique_positions, c(yPos)))
 
 # convert xPos and yPos to PositionsID(from Positions_tibble) in overallData
 
 
 # convert Animal Number to AnimalID(from Animals_tibble) in overallData
-overallData_animanls <- overallData%>%
+overallData_animals <- overallData%>%
   left_join(Animals_tibble, by = c("Animal")) %>%
   mutate(AnimalID = ifelse(is.na(AnimalID), "Unknown", as.character(AnimalID)))
 #######################################
@@ -131,11 +168,6 @@ plot(xPositionsfirstA, yPositionsfirstA)
 
 # grid to see the corners (8 coils)
 #vertical
-abline(v=(seq(0,300,100)), col="lightgray", lty="dotted")
+abline(v=(seq(0,400,100)), col="lightgray", lty="dotted")
 #horizontal
 abline(h=(seq(0,116,58)), col="lightgray", lty="dotted")
-
-##test
-x <- c("22:33:21.23","21:34:00.54")
-round(x,unit="seconds")
-round_date(x,unit="seconds")
