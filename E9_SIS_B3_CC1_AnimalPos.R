@@ -19,22 +19,22 @@ fileSourcePath <-  "S:/Lab_Member/Anja/Git/AnjaIntern/E9_SIS_B3_CC1_AnimalPos.cs
 overallData <- read_delim(fileSourcePath,delim = ";", show_col_types = FALSE)
 
 
-# normalization
+# organization of overallData:
 # delete unnecessary columns
 overallData <- select(overallData, -c(RFID, AM, zPos))
 # convert the DateTime column to a datetime format(also rounds the DateTime)
 overallData$DateTime <- as.POSIXct(overallData$DateTime, format = "%d.%m.%Y %H:%M:%S")
 
 # separate date and time into extra columns
-overallData[c('Date', 'Time')] <- str_split_fixed(overallData$DateTime, ' ', 2)
+#overallData[c('Date', 'Time')] <- str_split_fixed(overallData$DateTime, ' ', 2)
 
 # separate Animal into his ID an his system
 overallData[c('AnimalID', 'System')] <- str_split_fixed(overallData$Animal, '_', 2)
 
 
-#################### test ###########################################################
-library(dplyr)
+#################### convert xPos and yPos into one column named "PositionID" ###########################################################
 
+# finds corresponding PositionID from to coordinates(x_Pos, y_pos) in lookup_tibble and returns ID 
 find_id <- function(x_Pos, y_Pos, lookup_tibble) {
   result <- lookup_tibble %>%
     filter(xPos == x_Pos, yPos == y_Pos) %>%
@@ -47,30 +47,92 @@ find_id <- function(x_Pos, y_Pos, lookup_tibble) {
   }
 }
 
-#Positions
+#Positions_tibble contains every possible combination of our coordinates together with an ID
 positions <- select(overallData, c(xPos,yPos))
 unique_positions <- unique(positions)
-Positions_tibble <- tibble(PositionID = c(1:length(unique_positions$xPos)), xPos = select(unique_positions, c(xPos)), yPos = select(unique_positions, c(yPos)))
+Positions_tibble <- tibble(PositionID = c(1:length(unique_positions$xPos)), xPos = unique_positions[1], yPos = unique_positions[2])
 
-# Assuming tibble1 contains ID, x, and y columns and tibble2 contains x and y columns
+# Adding column PositionID to overallData instead of two colums with x and y coordinates
 overallData_ids <- overallData %>% rowwise() %>%
   mutate(PositionID = find_id(xPos, yPos, Positions_tibble))
 
 
-print(names(Positions_tibble))
-print(Positions_tibble$xPos)
-sorted <- Positions_tibble%>%
-  filter(xPos==0, yPos==116)
-print(sorted)
-
-find_id(0, 116, Positions_tibble)
 ##############################################################################
 
 # sort columns
-overallData_final <- overallData_ids[c('Date', 'Time', 'AnimalID', 'System', 'PositionID')]
+overallData_final <- overallData_ids[c('DateTime', 'AnimalID', 'System', 'PositionID')]
+
+########################################################################################################
+## divide overallData_final into his 5 different systems (5 different mouse cages)
+
+# maybe just safe the ids from each cage in a vector?
+
+data_systemOne <- overallData_final%>%
+  filter(System=="sys.1")
+data_systemTwo <- overallData_final%>%
+  filter(System=="sys.2")
+data_systemThree <- overallData_final%>%
+  filter(System=="sys.3")
+data_systemFour <- overallData_final%>%
+  filter(System=="sys.4")
+data_systemFive <- overallData_final%>%
+  filter(System=="sys.5")
+
+## create empty time tibble that contains rows for every second in 5 days
+# Erzeuge eine Sequenz von Zeitstempeln
+start_time <- as.POSIXct("2023-04-24 00:00:00", tz = "UTC")
+end_time <- as.POSIXct("2023-04-28 23:59:59", tz = "UTC")
+
+time_sequence <- seq(start_time, end_time, by = "1 sec")
+
+# Konvertiere die Zeitstempel in ein Tibble
+fullTime <- tibble(DateTime = time_sequence)
+############################################################################
+# for every mouse from system one enter information
+enter_mouseData_into_fullTime <- function(mouseTibble, fullTimeTibble){
+  #vector of each mouse in mouseTibble
+  unique_mice <- unique(mouseTibble$AnimalID)
+  #for every time row from one mouse in mouseTibble
+  for(mouse in unique_mice){
+    print(mouse)
+    #   create new column for AnimalID
+    fullTimeTibble <- fullTimeTibble%>%
+      mutate(mouse = NA)
+    # filter the mouse tibble only for the changes of current mouse
+    all_changes <- mouseTibble%>%
+      filter(AnimalID == mouse)
+    print(fullTimeTibble)
+    
+    for(changeTime in all_changes$DateTime){                   ##!!!undo the DateTime split in origin mouseTibble!!!
+      # save the new position at the moment of changeTime in extra variable
+      new_mouse_position <- mouseTibble%>%
+        filter(DateTime==changeTime)%>%
+        select(PositionID)
+      #   search the recorded time from changeTime in fullTimeTibble
+      current_row <- fullTimeTibble%>%
+        filter(DateTime==changeTime)
+      #enter new_mouse_position into current_row X mouse(row X column) from mouse in fullTimeTibble
+      if (is.na(fullTimeTibble[current_row, mouse])) {
+        my_tibble[current_row, mouse] <- new_mouse_position
+      } else {
+        stop("Error: The current cell already has a value.")
+      }
+    }
+    
+  }
+}
+
+##test
+new_mouse_position <- data_systemOne%>%
+  filter(DateTime=="2023-04-24 12:24:52", AnimalID=="OR428")
+new_mouse_position <- new_mouse_position%>%
+  select(PositionID)
+
+
+test_tibble <- enter_mouseData_into_fullTime(data_systemOne,fullTime)
+
 
 ########################################################################################################maybe not necessary
-# 2NF m&3NF
 ### create extra tibbles out of overallData: ###
 # Dates
 unique_dates <- unique(overallData$Date)
@@ -90,11 +152,10 @@ unique_animals <- unique(overallData$Animal)
 Animals_tibble <- tibble(AnimalID = c(1:length(unique_animals)), Animal = unique_animals)
 
 #Positions
-positions <- select(overallData, c(xPos,yPos))
-unique_positions <- unique(positions)
-Positions_tibble <- tibble(PositionID = c(1:length(unique_positions$xPos)), xPos = select(unique_positions, c(xPos)), yPos = select(unique_positions, c(yPos)))
+#positions <- select(overallData, c(xPos,yPos))
+#unique_positions <- unique(positions)
+#Positions_tibble <- tibble(PositionID = c(1:length(unique_positions$xPos)), xPos = select(unique_positions, c(xPos)), yPos = select(unique_positions, c(yPos)))
 
-# convert xPos and yPos to PositionsID(from Positions_tibble) in overallData
 
 
 # convert Animal Number to AnimalID(from Animals_tibble) in overallData
@@ -102,27 +163,6 @@ overallData_animals <- overallData%>%
   left_join(Animals_tibble, by = c("Animal")) %>%
   mutate(AnimalID = ifelse(is.na(AnimalID), "Unknown", as.character(AnimalID)))
 #######################################
-library(dplyr)
-
-# Beispiel-Datensätze (Ersetzen Sie diese mit Ihren eigenen Daten)
-coordinates_table <- tibble(
-  x = c(10, 20, 30),
-  y = c(15, 25, 35)
-)
-
-id_mapping_table <- tibble(
-  ID = c(1, 2, 3),
-  x = c(10, 20, 30),
-  y = c(15, 25, 35)
-)
-
-# Zusammenführen der Tabellen basierend auf den Koordinaten
-result <- coordinates_table %>%
-  left_join(id_mapping_table, by = c("x", "y")) %>%
-  mutate(ID = ifelse(is.na(ID), "Unknown", as.character(ID)))  # Wenn keine Übereinstimmung gefunden wurde, als "Unknown" markieren oder entsprechend anpassen
-
-# Ausgabe des Ergebnisses
-print(result)
 
 ###########################################################################################
 # test to acces special table rows...
