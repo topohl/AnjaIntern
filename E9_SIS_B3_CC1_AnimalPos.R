@@ -80,8 +80,8 @@ data_systemFive <- overallData_final%>%
 
 ## create empty time tibble that contains rows for every second in 5 days
 # Erzeuge eine Sequenz von Zeitstempeln
-start_time <- as.POSIXct("2023-04-24 00:00:00", tz = "UTC")
-end_time <- as.POSIXct("2023-04-28 23:59:59", tz = "UTC")
+start_time <- as.POSIXct("2023-04-24 00:00:00", tz = "")
+end_time <- as.POSIXct("2023-04-28 23:59:59", tz = "")
 
 time_sequence <- seq(start_time, end_time, by = "1 sec")
 
@@ -92,28 +92,45 @@ fullTime <- tibble(DateTime = time_sequence)
 enter_mouseData_into_fullTime <- function(mouseTibble, fullTimeTibble){
   #vector of each mouse in mouseTibble
   unique_mice <- unique(mouseTibble$AnimalID)
+  print(unique_mice)
   #for every time row from one mouse in mouseTibble
   for(mouse in unique_mice){
     print(mouse)
+  
     #   create new column for AnimalID
     fullTimeTibble <- fullTimeTibble%>%
-      mutate(mouse = NA)
+      mutate(!!mouse := NA)
+    print(fullTimeTibble)
     # filter the mouse tibble only for the changes of current mouse
     all_changes <- mouseTibble%>%
       filter(AnimalID == mouse)
-    print(fullTimeTibble)
+    print(all_changes)
     
-    for(changeTime in all_changes$DateTime){                   ##!!!undo the DateTime split in origin mouseTibble!!!
+    for(changeTime in as.vector(all_changes$DateTime)){                   ##!!!undo the DateTime split in origin mouseTibble!!!
+      cat("changeTime: ", changeTime, "\n")
+      
+      
       # save the new position at the moment of changeTime in extra variable
       new_mouse_position <- mouseTibble%>%
         filter(DateTime==changeTime)%>%
-        select(PositionID)
+        filter(AnimalID == mouse)%>%
+        select(PositionID)%>%
+        as.numeric()
+      cat("\n", "new_mouse_position: ", "\n")
+      print(new_mouse_position)
+      
+      
       #   search the recorded time from changeTime in fullTimeTibble
+      cat("changeTime: ", changeTime, "\n")
       current_row <- fullTimeTibble%>%
         filter(DateTime==changeTime)
+      cat("\n", "current row: ", "\n")
+      print(current_row)
+      
+      
       #enter new_mouse_position into current_row X mouse(row X column) from mouse in fullTimeTibble
-      if (is.na(fullTimeTibble[current_row, mouse])) {
-        my_tibble[current_row, mouse] <- new_mouse_position
+      if (is.na(fullTimeTibble[rownames(current_row), mouse])) {
+        fullTimeTibble[rownames(current_row), mouse] <- new_mouse_position
       } else {
         stop("Error: The current cell already has a value.")
       }
@@ -127,9 +144,29 @@ new_mouse_position <- data_systemOne%>%
   filter(DateTime=="2023-04-24 12:24:52", AnimalID=="OR428")
 new_mouse_position <- new_mouse_position%>%
   select(PositionID)
+mouse <- "86876"
+!!sym(mouse)
+for (change in overallData$DateTime){
+  print(change)
+}
 
+all_changes <- data_systemOne%>%
+  filter(AnimalID == "OR428")
+print(all_changes)
 
-test_tibble <- enter_mouseData_into_fullTime(data_systemOne,fullTime)
+all_change_times <- as.vector(all_changes$DateTime)
+print(all_change_times)
+
+print(1682332025==1682332051)
+print(distinct(as.vector(data_systemOne$DateTime)))
+
+current_row <- fullTime%>%
+  filter(DateTime==as.POSIXct("2023-04-24 14:24:52"))
+cat("\n", "current row: ", "\n")
+print(current_row)
+
+#test function
+enter_mouseData_into_fullTime(data_systemOne,fullTime)
 
 
 ########################################################################################################maybe not necessary
