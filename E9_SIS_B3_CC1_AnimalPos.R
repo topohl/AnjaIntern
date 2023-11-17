@@ -93,6 +93,8 @@ enter_mouseData_into_fullTime <- function(mouseTibble, fullTimeTibble){
   #vector of each mouse in mouseTibble
   unique_mice <- unique(mouseTibble$AnimalID)
   print(unique_mice)
+  counter <- 1
+  
   #for every time row from one mouse in mouseTibble
   for(mouse in unique_mice){
     print(mouse)
@@ -105,12 +107,19 @@ enter_mouseData_into_fullTime <- function(mouseTibble, fullTimeTibble){
       filter(AnimalID == mouse)
     print(all_changes)
     
-    for(changeTime in as.vector(all_changes$DateTime)){                   ##!!!undo the DateTime split in origin mouseTibble!!!
-      cat("changeTime: ", changeTime, "\n")
+    for(changeTime in as.vector(all_changes$DateTime)){  
+      cat("mouse: ", mouse, "\n")   
+      cat("Row: ", counter, "\n")                
+      date_time <- as.POSIXct(changeTime, origin = "1970-01-01")
+      formatted_date <- format(date_time, "%Y-%m-%d %H:%M:%S") 
+      cat("changeTime-stamp: ", changeTime, "\n")
+      cat("actual changeTime: ", formatted_date, "\n")
       
-      cat("fullTimeTibble", "\n")
-      print(fullTimeTibble)
-      
+      cat("fullTimeTibble: ", "\n")
+      #print(fullTimeTibble[45363:45563, ])
+      print_tibble <- fullTimeTibble %>%
+        slice(45385:45585) %>%
+        print()
       
       # save the new position at the moment of changeTime in extra variable
       new_mouse_position <- mouseTibble%>%
@@ -122,27 +131,28 @@ enter_mouseData_into_fullTime <- function(mouseTibble, fullTimeTibble){
       print(new_mouse_position)
       
       
-      #   search the recorded time from changeTime in fullTimeTibble
-      cat("changeTime: ", changeTime, "\n")
-      current_row <- fullTimeTibble%>%
-        filter(DateTime==changeTime)
-      cat("\n", "current row: ", "\n")
+      #   search the recorded time from changeTime in fullTimeTibble and save row index
+      current_row <- which(fullTimeTibble$DateTime == changeTime)
+        
+      cat("\n", "current row: ")
       print(current_row)
       
-      
       #enter new_mouse_position into current_row X mouse(row X column) from mouse in fullTimeTibble
-      if (is.na(fullTimeTibble[rownames(current_row), mouse])) {
-        fullTimeTibble[rownames(current_row), mouse] <- new_mouse_position
+      if (is.na(fullTimeTibble[current_row, mouse])) {
+        fullTimeTibble[current_row, mouse] <- new_mouse_position
       } else {
-        print(fullTimeTibble[rownames(current_row), mouse] <- new_mouse_position)
+        print(fullTimeTibble[current_row, mouse] <- new_mouse_position)
         stop("Error: The current cell already has a value.")
       }
       cat("test position after entering value", "\n")
-      print(fullTimeTibble[rownames(current_row), mouse])
+      print(fullTimeTibble[current_row, mouse])
       cat("END OF ROUND", "\n")
       cat("\n")
+      counter <- counter+1
+      
     }
   }
+  return(fullTimeTibble)
 }
 
 ##test
@@ -177,10 +187,14 @@ testest <- tibble(
   b=c(7,8,9)
 )
 testest[3,"a"] <- 3
-  
+rowtest <- testest%>%
+  filter(a==2)%>%
+  rownames()
+rowtest
+rownames(rowtest)  
 
 #test function
-enter_mouseData_into_fullTime(data_systemOne,fullTime)
+fullTime_test <- enter_mouseData_into_fullTime(data_systemOne,fullTime)
 
 
 ########################################################################################################maybe not necessary
