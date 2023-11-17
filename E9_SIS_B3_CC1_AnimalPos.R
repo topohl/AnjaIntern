@@ -122,6 +122,11 @@ enter_mouseData_into_fullTime <- function(mouseTibble, fullTimeTibble){
         print()
       
       # save the new position at the moment of changeTime in extra variable
+      print(typeof(mouseTibble$DateTime))
+      print(typeof(changeTime))
+      print(typeof(mouseTibble$AnimalID))
+      print(typeof(mouse))
+      
       new_mouse_position <- mouseTibble%>%
         filter(DateTime==changeTime)%>%
         filter(AnimalID == mouse)%>%
@@ -192,7 +197,8 @@ rowtest <- testest%>%
   rownames()
 rowtest
 rownames(rowtest)  
-
+typeof(testest)
+typeof(rowtest)
 #test function
 fullTime_test <- enter_mouseData_into_fullTime(data_systemOne,fullTime)
 
