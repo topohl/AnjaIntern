@@ -131,28 +131,27 @@ enter_mouseData_into_fullTime <- function(mouseTibble, fullTimeTibble){
       new_mouse_position_vector <- mouseTibble%>%
         filter(DateTime==changeTime)%>%
         filter(AnimalID == mouse)%>%
-        select(PositionID)%>%
-        as.vector()
+        select(PositionID)
+      new_mouse_position_vector <- c(new_mouse_position_vector$PositionID)
+      
+      
       cat("\n", "new_mouse_position: ", "\n")
       print(new_mouse_position_vector)
       
       #   search the recorded time from changeTime in fullTimeTibble and save row index
       current_row <- which(fullTimeTibble$DateTime == changeTime)
+      current_row <- current_row[1]
       cat("\n", "current row: ")
       print(current_row)
       
       for(new_mouse_position in new_mouse_position_vector){
-      #enter new_mouse_position into current_row X mouse(row X column) from mouse in fullTimeTibble
-      if (is.na(fullTimeTibble[current_row, mouse])) {
-        fullTimeTibble[current_row, mouse] <- new_mouse_position
-      } else {
-        if(length(new_mouse_position_vector)>1){  #if there are multiple position values for the same changeTime(rounded to second)
+        #enter new_mouse_position into current_row X mouse(row X column) from mouse in fullTimeTibble
+        if (is.na(fullTimeTibble[current_row, mouse])) {
+          fullTimeTibble[current_row, mouse] <- new_mouse_position
+        }else {#another position exists
+          fullTimeTibble <-add_row(fullTimeTibble, DateTime = ymd_hms("2023-04-25 23:37:38", tz = ""),OR428=new_mouse_position, .after = current_row)
           
-        }else{
-          print(fullTimeTibble[current_row, mouse] <- new_mouse_position)
-          stop("Error: The current cell already has a value.")
         }
-      }
       
       }
       
@@ -211,7 +210,7 @@ typeof(rowtest)
 
 
 
-
+##############################################
 bubble <- data_systemOne%>%
   filter(DateTime=="2023-04-25 23:37:38")%>%
   filter(AnimalID=="OR428")%>%
@@ -219,10 +218,9 @@ bubble <- data_systemOne%>%
   
 bubbletwo <- c(bubble$PositionID)
 
-##############################################
 
 fullTimeTibble <-fullTime%>%
-  filter(date(DateTime) == ymd("2023-04-25"))%>%
+  filter(date(DateTime) == ymd("2023-04-25", tz=))%>%
   mutate("OR428" := NA)
 
 #   search the recorded time from changeTime in fullTimeTibble and save row index
@@ -232,7 +230,7 @@ mouse <- "OR428"
 #####
 fullTimeTibble[current_row, mouse] <- 7
 fullTimeTibble <- fullTimeTibble %>%
-  add_row(DateTime = ymd_hms("2023-04-25 23:37:38", tz = "UTC"), OR428 = 8, .after = current_row)
+  add_row(DateTime = ymd_hms("2023-04-25 23:37:38", tz = ""), OR428 = 8, .after = current_row)
 
 #tz = ""
 #######
@@ -243,11 +241,11 @@ for(new_mouse_position in bubbletwo){
   if (is.na(fullTimeTibble[current_row, mouse])) {
     fullTimeTibble[current_row, mouse] <- new_mouse_position
   } else {#another position exists
-    fullTimeTibble <-add_row(fullTimeTibble, DateTime = ymd_hms("2023-04-25 23:37:38"),OR428=new_mouse_position, .after = current_row)
+    fullTimeTibble <-add_row(fullTimeTibble, DateTime = ymd_hms("2023-04-25 23:37:38", tz = ""),OR428=new_mouse_position, .after = current_row)
     #fullTimeTibble <- fullTimeTibble %>% add_row(DateTime = ymd_hms("2023-04-25 23:37:38"), OR428 = 9, .after = current_row)
   }
 }
-##############################################
+########################################################################
 
 
 #test function
