@@ -167,6 +167,65 @@ enter_mouseData_into_fullTime <- function(mouseTibble, fullTimeTibble){
   return(fullTimeTibble)
 }
 
+
+
+#test function
+fullTime_test <- enter_mouseData_into_fullTime(data_systemOne,fullTime)
+
+###############################################################################
+#fill_na_row_one <- 
+
+#map(fullTime_test$OR428, ~ {
+  # Hier wird für jede Zeile die gewünschte Operation durchgeführt
+#  if(is.na && #index nicht 1){
+#    if(#wert darüber existiert){
+      #nehme wert darüber
+#    }
+#  }
+#})
+
+fill_na_row_one <- fullTime_test %>%
+  select(DateTime, OR428)
+#################################################################
+#von zeile 2 bis ende
+for (i in 2:nrow(fullTime_test)) {
+  if (is.na(fullTime_test$OR428[i])) {
+    fullTime_test$OR428[i] <- fullTime_test$OR428[i - 1]
+  }
+}
+for (i in 2:nrow(fullTime_test)) {
+  if (is.na(fullTime_test$OR432[i])) {
+    fullTime_test$OR432[i] <- fullTime_test$OR432[i - 1]
+  }
+}
+for (i in 2:nrow(fullTime_test)) {
+  if (is.na(fullTime_test$OR424[i])) {
+    fullTime_test$OR424[i] <- fullTime_test$OR424[i - 1]
+  }
+}
+for (i in 2:nrow(fullTime_test)) {
+  if (is.na(fullTime_test$OR419[i])) {
+    fullTime_test$OR419[i] <- fullTime_test$OR419[i - 1]
+  }
+}
+######################################################################
+
+#rename
+fullTime_test_filled <- fullTime_test
+
+# all column names except DateTime
+column_names <- colnames(fullTime_test_filled)[-1]
+
+for(mouse in column_names){
+  print(mouse)
+  #for (i in 2:nrow(fullTime_test_filled)) {
+  #  if (is.na(fullTime_test_filled$mouse[i])) {
+  #    fullTime_test_filled$mouse[i] <- fullTime_test_filled$mouse[i - 1]
+  #  }
+  #}
+}
+
+#############################################################################
 ##test
 new_mouse_position <- data_systemOne%>%
   filter(DateTime=="2023-04-24 12:24:52", AnimalID=="OR428")
@@ -248,8 +307,6 @@ for(new_mouse_position in bubbletwo){
 ########################################################################
 
 
-#test function
-fullTime_test <- enter_mouseData_into_fullTime(data_systemOne,fullTime)
 
 
 ########################################################################################################maybe not necessary
