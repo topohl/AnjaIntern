@@ -208,6 +208,10 @@ for (i in 2:nrow(fullTime_test)) {
     fullTime_test$OR419[i] <- fullTime_test$OR419[i - 1]
   }
 }
+
+#save as excel file
+library(writexl)
+write_csv(fullTime_test, "fullTime_test.csv")
 ######################################################################
 
 #rename
