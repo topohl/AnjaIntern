@@ -14,6 +14,9 @@ library(tibble)       #important for tibble operations
 # paths
 fileSourcePath <-  "S:/Lab_Member/Anja/Git/AnjaIntern/E9_SIS_B3_CC1_AnimalPos.csv"
 
+#fuctions
+working_directory <- "S:/Lab_Member/Anja/Git/AnjaIntern"
+source(paste0(working_directory,"/E9_SIS_B3_CC1_AnimalPos-functions.R"))
 
 # read csv file in tibble
 
@@ -32,20 +35,8 @@ overallData[c('AnimalID', 'System')] <- str_split_fixed(overallData$Animal, '_',
 
 #################### convert xPos and yPos into one column named "PositionID" ###########################################################
 
-# finds corresponding PositionID from to coordinates(x_Pos, y_pos) in lookup_tibble and returns ID 
-find_id <- function(x_Pos, y_Pos, lookup_tibble) {
-  result <- lookup_tibble %>%
-    filter(xPos == x_Pos, yPos == y_Pos) %>%
-    select(PositionID)
-  
-  if (nrow(result) > 0) {
-    return(result$PositionID)
-  } else {
-    return(NA) # Return NA if no match found
-  }
-}
 
-#Positions_tibble contains every possible combination of our coordinates together with an ID
+#create Positions_tibble that contains every possible combination of our coordinates together with an ID
 positions <- select(overallData, c(xPos,yPos))
 unique_positions <- unique(positions)
 Positions_tibble <- tibble(PositionID = c(1:length(unique_positions$xPos)), xPos = unique_positions[1], yPos = unique_positions[2])
@@ -59,11 +50,11 @@ overallData_ids <- overallData %>% rowwise() %>%
 
 # sort columns
 overallData_final <- overallData_ids[c('DateTime', 'AnimalID', 'System', 'PositionID')]
-
+# column as tibble
 overallData_final <- as_tibble(overallData_final)
 ########################################################################################################
 
-# algorithm 
+# algorithm: 
 
 # initialize mice lists with empty name, start time and start position of every mouse in one system(4mice together)
 mouseOne    <- list(name="", time="", position=0)
