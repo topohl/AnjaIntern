@@ -97,24 +97,41 @@ for (i in 1:length(mouse_names_systemOne)){ #i=1-4
     
   #write name, position and time into mice_list
   mice_list[i][[1]] <- mouse_name
-  print(mouse_name)
+  #print(mouse_name)
   
   first_time <- first_entry$DateTime
   mice_list[[i]][[2]] <- first_time
-  print(first_time)
+  #print(first_time)
   
   first_position <- first_entry$PositionID
   mice_list[[i]][[3]] <- first_position
-  print(first_position)
+  #print(first_position)
 }
 
 #####################################################################################
 
 # function to check for closeness
-# input: mice:list
+# input: mice_list
 # compare every sublist(4)to each other
-# return list of mice that are close to each other
-# like(("OR428","OR420"),...)
+check_closeness <- function(mice_list){
+  
+  # create every possible couple
+  mice <- names(mice_list)
+  combination <- as_tibble(combn(mice, 2))
+  
+  for (i in 1:3) {
+    for (j in (i+1):4) {
+      print(c(i, j))
+      #print(mice_list[[i]][[3]])
+      #print(mice_list[[j]][[3]])
+      print(mice_list[[i]][[3]]==mice_list[[j]][[3]])
+    }
+  }
+  # compare the third value of every couple
+  # if the position is the same, save in result list?
+  # return list of mice that are close to each other
+  # like(("OR428","OR420"),...)
+}
 ######################################################################
 
 # (function?) to check if closer mice are still together
