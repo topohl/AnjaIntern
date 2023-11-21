@@ -66,10 +66,10 @@ overallData_final <- as_tibble(overallData_final)
 # algorithm 
 
 # declare start position and start time of mouse in one system(4mice together)
-mouseOne    <- list(name="", time="")
-mouseTwo    <- list(name="", time="")
-mouseThree  <- list(name="", time="")
-mouseFour   <- list(name="", time="")
+mouseOne    <- list(name="", time="", position=0)
+mouseTwo    <- list(name="", time="", position=0)
+mouseThree  <- list(name="", time="", position=0)
+mouseFour   <- list(name="", time="", position=0)
 
 mice_list <- list(
   "mouseOne" = mouseOne,
@@ -91,19 +91,30 @@ mice_systemOne <- overallData_final%>%
 mouse_names_systemOne <- unique(mice_systemOne$AnimalID)
 mouse_names_systemOne[[1]]
 
-# find the first time where mouse is tracked in the cage
+# find the FIRST TIME where mouse is tracked in the cage
 # aka first value of mopuse in overallData_final
 for (i in 1:length(mouse_names_systemOne)){ #von i=1-4
-  #search in whole data
+  
+  #rename
+  mouse_name <- mouse_names_systemOne[[i]]
+  #search first entry in whole data
   first_entry <- overallData_final%>%
-    filter(AnimalID == mouse_names_systemOne[[i]])%>%
-    slice(1) #erste Zeile/ filter(row_number()==1)
+    filter(AnimalID == mouse_name)%>%
+    slice(1) #first row
     
+  #write name, position and time into mice_list
+  mice_list[i][[1]] <- mouse_name
+  print(mouse_name)
+  
   first_time <- first_entry$DateTime
-  first_position <- first_entry$PositionID
-  #give time and position in list
+  mice_list[[i]][[2]] <- first_time
   print(first_time)
+  
+  first_position <- first_entry$PositionID
+  mice_list[[i]][[3]] <- first_position
   print(first_position)
 }
 
-
+#print(verschachtelte_liste[["tier1"]][[2]])
+print(mice_list[mouse_names_systemOne[[i]]][[1]])
+mice_list[mouse_names_systemOne[[i]]][[1]] <- first_time
