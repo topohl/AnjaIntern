@@ -59,18 +59,19 @@ overallData_ids <- overallData %>% rowwise() %>%
 
 # sort columns
 overallData_final <- overallData_ids[c('DateTime', 'AnimalID', 'System', 'PositionID')]
-#?
+
 overallData_final <- as_tibble(overallData_final)
 ########################################################################################################
 
 # algorithm 
 
-# declare start position and start time of mouse in one system(4mice together)
+# initialize mice lists with empty name, start time and start position of every mouse in one system(4mice together)
 mouseOne    <- list(name="", time="", position=0)
 mouseTwo    <- list(name="", time="", position=0)
 mouseThree  <- list(name="", time="", position=0)
 mouseFour   <- list(name="", time="", position=0)
 
+#put the four lists in one list together
 mice_list <- list(
   "mouseOne" = mouseOne,
   "mouseTwo" = mouseTwo,
@@ -84,16 +85,17 @@ for (sub_list in names(mice_list)) {
     print(element)
   }
 }
-# save names of the first system
+
+# save unique names of the first system:
 mice_systemOne <- overallData_final%>%
   filter(System == "sys.1")
 
 mouse_names_systemOne <- unique(mice_systemOne$AnimalID)
-mouse_names_systemOne[[1]]
 
+#####################################################################################
 # find the FIRST TIME where mouse is tracked in the cage
-# aka first value of mopuse in overallData_final
-for (i in 1:length(mouse_names_systemOne)){ #von i=1-4
+# aka first value of mouse in overallData_final
+for (i in 1:length(mouse_names_systemOne)){ #i=1-4
   
   #rename
   mouse_name <- mouse_names_systemOne[[i]]
@@ -115,6 +117,24 @@ for (i in 1:length(mouse_names_systemOne)){ #von i=1-4
   print(first_position)
 }
 
-#print(verschachtelte_liste[["tier1"]][[2]])
-print(mice_list[mouse_names_systemOne[[i]]][[1]])
-mice_list[mouse_names_systemOne[[i]]][[1]] <- first_time
+#####################################################################################
+
+# function to check for closeness
+# input: mice:list
+# compare every sublist(4)to each other
+# return list of mice that are close to each other
+# like(("OR428","OR420"),...)
+######################################################################
+
+# (function?) to check if closer mice are still together
+# counter for every possible couple
+# reset and SAVE if not still close, count+1 if still close
+
+#####
+# function to save results in proper way
+######################################################################
+
+# function to do shift in time(one second forward)
+# return eventually alterated mice_list
+
+######### repeat over and over
