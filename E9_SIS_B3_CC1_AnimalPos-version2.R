@@ -60,10 +60,16 @@ md1 <- overallData_final%>%
   filter(grepl("2023-04-24", DateTime))%>%
   filter(PositionID<=8)%>%
   filter(hour(DateTime) == 19)
-
 md1 <- select(md1,c(DateTime, PositionID))
-#alterated_pos <- map(overallData_final$PositionID, ~ .+0.125)
-plot_micePositions_together(md1)
+
+md2 <- overallData_final%>%
+  filter(AnimalID=="OR414")%>%
+  filter(grepl("2023-04-24", DateTime))%>%
+  filter(PositionID<=8)%>%
+  filter(hour(DateTime) == 19)
+md2 <- select(md2,c(DateTime, PositionID))
+
+plot_micePositions_together(md1, md2)
 
 ########################################################################################################
 
