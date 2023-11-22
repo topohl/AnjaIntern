@@ -37,18 +37,9 @@ custom_labels <- function(x) {
 plot_micePositions_together <- function(m1){#startTime,, m2, m3, m4 ...
   
   #alterate y-points to 0,125
-  #map 
-  #print(m1$PositionID)
-  #print(typeof(m1$PositionID))
-  
-  #alterated_pos <- map(m1$PositionID, ~ .+0.125)
   m1 <- m1%>%
     mutate(PrettyPos = map_dbl(m1$PositionID, ~ .+0.125))#(m1$PositionID, ~ .+0.125))
-  print(m1$PrettyPos)
-  #print(alterated_pos)
-  #print(typeof(alterated_pos))
-  
-  # m1 = DateTime, PositionID from mouse one
+  #define data
   data1 <- data.frame(
     time = m1$DateTime,
     position = m1$PrettyPos
@@ -56,10 +47,10 @@ plot_micePositions_together <- function(m1){#startTime,, m2, m3, m4 ...
   
   
   ggplot() +
-    geom_point(data = data1, aes(x = time, y = position), size = 3, color = "blue") +
+    geom_point(data = data1, aes(x = time, y = position), size = 1, color = "blue") +
     geom_segment(data = data1 %>% mutate(next_time = lead(time, default = last(time))),
                  aes(x = time, xend = next_time, y = position, yend = position),
-                 arrow = arrow(length = unit(0.2, "cm")), size = 0.5, color = "blue") +
+                 arrow = arrow(length = unit(0.1, "cm")), size = 0.5, color = "blue") +
     geom_hline(yintercept = 1:8, color = "black", linetype = "solid", size = 0.5) + 
     scale_x_datetime(date_breaks = "2 hours", date_labels = "%H:%M") +  # X-Achsenbeschriftung
     scale_y_continuous(breaks = seq(1.0,9.0, by=0.5), labels = custom_labels) +  # Y-Achsenbeschriftung
