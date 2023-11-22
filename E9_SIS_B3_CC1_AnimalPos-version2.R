@@ -9,7 +9,7 @@ library(stringr)
 library(dplyr)
 library(lubridate)    # for rounding time
 library(tibble)       #important for tibble operations
-
+library(purrr)
 
 # paths
 fileSourcePath <-  "S:/Lab_Member/Anja/Git/AnjaIntern/E9_SIS_B3_CC1_AnimalPos.csv"
@@ -52,6 +52,19 @@ overallData_ids <- overallData %>% rowwise() %>%
 overallData_final <- overallData_ids[c('DateTime', 'AnimalID', 'System', 'PositionID')]
 # column as tibble
 overallData_final <- as_tibble(overallData_final)
+########################################################################################################
+# plot existing data
+#mouse1 on day 1
+md1 <- overallData_final%>%
+  filter(AnimalID=="OR428")%>%
+  filter(grepl("2023-04-24", DateTime))%>%
+  filter(PositionID<=8)%>%
+  filter(hour(DateTime) == 19)
+
+md1 <- select(md1,c(DateTime, PositionID))
+#alterated_pos <- map(overallData_final$PositionID, ~ .+0.125)
+plot_micePositions_together(md1)
+
 ########################################################################################################
 
 # algorithm: 
@@ -132,6 +145,10 @@ check_closeness <- function(mice_list){
   # return list of mice that are close to each other
   # like(("OR428","OR420"),...)
 }
+#idee
+print(mice_list[[i]])
+
+
 ######################################################################
 
 # (function?) to check if closer mice are still together
