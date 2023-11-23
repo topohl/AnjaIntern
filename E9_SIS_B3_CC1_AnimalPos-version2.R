@@ -110,9 +110,10 @@ time <- start_time
 
 ###try a loop
 #first last second:
-last_time <- "2023-04-28 11:00:14"
+#last_time <- "2023-04-28 11:00:14"
+last_time <- "2023-04-25 11:00:14"
 
-while(time <= last_time){
+for(i in 1:3600){
   time <- sec_shift(time)
     
   mice_list <- update_mice_list(mouse_names_systemOne, mice_list, overallData_final, time)
