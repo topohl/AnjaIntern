@@ -106,16 +106,22 @@ count_closeness_list <- check_closeness(mice_list, count_closeness_list)
 ##assign start time(choose one of the mices start time)
 start_time <- mice_list[[1]][[2]]
 
-mice_list <- sec_shift(mouse_names_systemOne, mice_list, overallData_final, start_time)
-
-count_closeness_list <- check_closeness(mice_list, count_closeness_list)
-
+time <- start_time
 
 ###try a loop
+#first last second:
+last_time <- "2023-04-28 11:00:14"
+
+while(time <= last_time){
+  time <- sec_shift(time)
+    
+  mice_list <- update_mice_list(mouse_names_systemOne, mice_list, overallData_final, time)
+  
+  count_closeness_list <- check_closeness(mice_list, count_closeness_list)
+}
 
 
-
-
+print(as.POSIXct(as.numeric(time), origin = "1970-01-01"))
 
 # Beispielzeitstempel
 #changeable in numeric state

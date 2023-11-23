@@ -78,9 +78,7 @@ check_closeness <- function(mice_list,count_closeness_list){
 
 ##############################################################################################################
 # function to do shift in time(one second forward)
-# return eventually alterated mice_list
-sec_shift <- function(system_mouse_names, mice_list, overallData_final, old_time){
-  
+sec_shift <- function( old_time){
   #put one second on top of old_time
   new_time <- old_time%>%
     as.numeric()%>%
@@ -88,9 +86,18 @@ sec_shift <- function(system_mouse_names, mice_list, overallData_final, old_time
     as.character()
   cat("old time: ", old_time, "\n")
   cat("new time: ", new_time, "\n")
+  return(new_time)
+}
+
+##############################################################################################################
+# update mice_list(if its possible) and return it
+# similarity to find_first_pos_and_time
+update_mice_list <- function(system_mouse_names, mice_list, overallData_final, time){
+  
+  
   #filter overallData_final with new_time
   new_time_rows <- overallData_final%>%
-    filter(DateTime == as.POSIXct(as.numeric(new_time), origin = "1970-01-01"))
+    filter(DateTime == as.POSIXct(as.numeric(time), origin = "1970-01-01"))
   print(new_time_rows)
   
   # enter new data in mice_list
@@ -108,11 +115,11 @@ sec_shift <- function(system_mouse_names, mice_list, overallData_final, old_time
     if(nrow(mouse_entry)>1){mouse_entry <- mouse_entry%>%slice(1)}
     #if new position happened during this second
     if(nrow(mouse_entry)==1){
-      print("blub")
+      print("new entrys")
       #write name, position and time into mice_list
-      mice_list[i][[1]] <- mouse_name
+      mice_list[i][[1]] <- mouse_name#redundant!
       
-      mice_list[[i]][[2]] <- new_time #mouse_entry$DateTime
+      mice_list[[i]][[2]] <- time #mouse_entry$DateTime?
       
       mice_list[[i]][[3]] <- mouse_entry$PositionID
     }
