@@ -23,7 +23,8 @@ source(paste0(working_directory,"/E9_SIS_B3_CC1_AnimalPos-functions.R"))
 overallData <- read_delim(fileSourcePath,delim = ";", show_col_types = FALSE)
 
 ####################################################################################################################################
-# organization of overallData:
+######ORGANIZATION OF overallData:######
+
 # delete unnecessary columns
 overallData <- select(overallData, -c(RFID, AM, zPos))
 # convert the DateTime column to a datetime format(also rounds the DateTime)
@@ -33,8 +34,9 @@ overallData$DateTime <- as.POSIXct(overallData$DateTime, format = "%d.%m.%Y %H:%
 overallData[c('AnimalID', 'System')] <- str_split_fixed(overallData$Animal, '_', 2)
 
 
-#################### convert xPos and yPos into one column named "PositionID" ###########################################################
 
+
+###### convert xPos and yPos into one column named "PositionID" ######
 
 #create Positions_tibble that contains every possible combination of our coordinates together with an ID
 positions <- select(overallData, c(xPos,yPos))
@@ -46,34 +48,15 @@ overallData_ids <- overallData %>% rowwise() %>%
   mutate(PositionID = find_id(xPos, yPos, Positions_tibble))
 
 
-##############################################################################
 
-# sort columns
+##### sort columns #####
 overallData_final <- overallData_ids[c('DateTime', 'AnimalID', 'System', 'PositionID')]
 # column as tibble
 overallData_final <- as_tibble(overallData_final)
-########################################################################################################
-# plot existing data
-#mouse1 on day 1
-md1 <- overallData_final%>%
-  filter(AnimalID=="OR428")%>%
-  filter(grepl("2023-04-24", DateTime))%>%
-  filter(PositionID<=8)%>%
-  filter(hour(DateTime) == 19)
-md1 <- select(md1,c(DateTime, PositionID))
+################################################################################################################################
 
-md2 <- overallData_final%>%
-  filter(AnimalID=="OR414")%>%
-  filter(grepl("2023-04-24", DateTime))%>%
-  filter(PositionID<=8)%>%
-  filter(hour(DateTime) == 19)
-md2 <- select(md2,c(DateTime, PositionID))
 
-plot_micePositions_together(md1, md2)
-
-########################################################################################################
-
-# algorithm: 
+# ALGORITHM: 
 
 # initialize mice lists with empty name, start time and start position of every mouse in one system(4mice together)
 mouseOne    <- list(name="", time="", position=0)
@@ -103,29 +86,12 @@ mice_systemOne <- overallData_final%>%
 mouse_names_systemOne <- unique(mice_systemOne$AnimalID)
 
 #####################################################################################
-# find the FIRST TIME where mouse is tracked in the cage
-# aka first value of mouse in overallData_final
-for (i in 1:length(mouse_names_systemOne)){ #i=1-4
-  
-  #rename
-  mouse_name <- mouse_names_systemOne[[i]]
-  #search first entry in whole data
-  first_entry <- overallData_final%>%
-    filter(AnimalID == mouse_name)%>%
-    slice(1) #first row
-    
-  #write name, position and time into mice_list
-  mice_list[i][[1]] <- mouse_name
-  #print(mouse_name)
-  
-  first_time <- first_entry$DateTime
-  mice_list[[i]][[2]] <- first_time
-  #print(first_time)
-  
-  first_position <- first_entry$PositionID
-  mice_list[[i]][[3]] <- first_position
-  #print(first_position)
-}
+
+#update mice_list to first time and first position
+mice_list <- find_first_pos_and_time(mouse_names_systemOne, overallData_final, mice_list)
+
+
+
 
 #####################################################################################
 #initialize mice closeness result
@@ -168,3 +134,22 @@ sec_shift <- function(mice_list, overallData_final, old_time){
 # function to save results in proper way
 ######################################################################
 
+# plot existing data
+#mouse1 on day 1
+md1 <- overallData_final%>%
+  filter(AnimalID=="OR428")%>%
+  filter(grepl("2023-04-24", DateTime))%>%
+  filter(PositionID<=8)%>%
+  filter(hour(DateTime) == 19)
+md1 <- select(md1,c(DateTime, PositionID))
+
+md2 <- overallData_final%>%
+  filter(AnimalID=="OR414")%>%
+  filter(grepl("2023-04-24", DateTime))%>%
+  filter(PositionID<=8)%>%
+  filter(hour(DateTime) == 19)
+md2 <- select(md2,c(DateTime, PositionID))
+
+plot_micePositions_together(md1, md2)
+
+########################################################################################################

@@ -25,6 +25,36 @@ find_id <- function(x_Pos, y_Pos, lookup_tibble) {
   }
 }
 ##############################################################################################################
+# find the FIRST TIME where mouse is tracked in the cage
+# aka first value of mouse in overallData_final
+find_first_pos_and_time <- function(system_mouse_names, overallData_final, mice_list){
+  
+  for (i in 1:length(system_mouse_names)){ #i=1-4
+    
+    #rename
+    mouse_name <- system_mouse_names[[i]]
+    #search first entry in whole data
+    first_entry <- overallData_final%>%
+      filter(AnimalID == mouse_name)%>%
+      slice(1) #first row
+    
+    #write name, position and time into mice_list
+    mice_list[i][[1]] <- mouse_name
+    #print(mouse_name)
+    
+    first_time <- first_entry$DateTime
+    mice_list[[i]][[2]] <- first_time
+    #print(first_time)
+    
+    first_position <- first_entry$PositionID
+    mice_list[[i]][[3]] <- first_position
+    #print(first_position)
+  }
+  return(mice_list)
+}
+
+
+##############################################################################################################
 # function to check for closeness
 # input: mice_list
 # compare every sublist(4)to each other
