@@ -77,6 +77,52 @@ check_closeness <- function(mice_list,count_closeness_list){
 }
 
 ##############################################################################################################
+# function to do shift in time(one second forward)
+# return eventually alterated mice_list
+sec_shift <- function(system_mouse_names, mice_list, overallData_final, old_time){
+  
+  #put one second on top of old_time
+  new_time <- old_time%>%
+    as.numeric()%>%
+    +1%>%
+    as.character()
+  cat("old time: ", old_time, "\n")
+  cat("new time: ", new_time, "\n")
+  #filter overallData_final with new_time
+  new_time_rows <- overallData_final%>%
+    filter(DateTime == as.POSIXct(as.numeric(new_time), origin = "1970-01-01"))
+  print(new_time_rows)
+  
+  # enter new data in mice_list
+  for (i in 1:length(system_mouse_names)){ #i=1-4
+    
+    #rename
+    mouse_name <- system_mouse_names[[i]]
+    #search current animal
+    mouse_entry <- new_time_rows%>%
+      filter(AnimalID == mouse_name)
+    
+    print(mouse_entry)
+    
+    #if double position entrys for same second, take first entry
+    if(nrow(mouse_entry)>1){mouse_entry <- mouse_entry%>%slice(1)}
+    #if new position happened during this second
+    if(nrow(mouse_entry)==1){
+      print("blub")
+      #write name, position and time into mice_list
+      mice_list[i][[1]] <- mouse_name
+      
+      mice_list[[i]][[2]] <- new_time #mouse_entry$DateTime
+      
+      mice_list[[i]][[3]] <- mouse_entry$PositionID
+    }
+    
+  }
+  
+  return(mice_list)
+}
+
+##############################################################################################################
 ## plot ##
 
 # Function for adjusting the Y-axis labelling

@@ -7,7 +7,7 @@
 library(readr)        # load readr package for reading csv files
 library(stringr)
 library(dplyr)
-library(lubridate)    # for rounding time
+library(lubridate)    # for rounding time, time operations in general
 library(tibble)       #important for tibble operations
 library(purrr)
 
@@ -106,22 +106,26 @@ count_closeness_list <- check_closeness(mice_list, count_closeness_list)
 ##assign start time(choose one of the mices start time)
 start_time <- mice_list[[1]][[2]]
 
-# function to do shift in time(one second forward)
-# return eventually alterated mice_list
-sec_shift <- function(mice_list, overallData_final, old_time){
-  #put one second on top of old_time
-  #new_time <- 
+
+mice_list <- sec_shift(mouse_names_systemOne, mice_list, overallData_final, start_time)
+
+
+
+# Beispielzeitstempel
+#changeable in numeric state
+#has to be a character in the end
+#new_time <- start_time%>%
+#  as.numeric()%>%
+#  +1%>%
+#  as.character()
+
+#printable in numeric state  
+#print(as.POSIXct(as.numeric(new_time), origin = "1970-01-01"))
   
-  #filter overallData_final with new_time
   
-  # enter new data in mice_list
+
+
   
-  return(mice_list)
-}
-
-
-
-
 ######### repeat over and over
 
 ######################################################################
