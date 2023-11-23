@@ -128,31 +128,16 @@ for (i in 1:length(mouse_names_systemOne)){ #i=1-4
 }
 
 #####################################################################################
+#initialize mice closeness result
+count_closeness_list <- list(   m1=c(0,0,0,0),
+                                m2=c(0,0,0,0),
+                                m3=c(0,0,0,0),
+                                m4=c(0,0,0,0))
 
-# function to check for closeness
-# input: mice_list
-# compare every sublist(4)to each other
-check_closeness <- function(mice_list){
-  
-  # create every possible couple
-  mice <- names(mice_list)
-  combination <- as_tibble(combn(mice, 2))
-  
-  for (i in 1:3) {
-    for (j in (i+1):4) {
-      print(c(i, j))
-      #print(mice_list[[i]][[3]])
-      #print(mice_list[[j]][[3]])
-      print(mice_list[[i]][[3]]==mice_list[[j]][[3]])
-    }
-  }
-  # compare the third value of every couple
-  # if the position is the same, save in result list?
-  # return list of mice that are close to each other
-  # like(("OR428","OR420"),...)
-}
-#idee
-print(mice_list[[i]])
+#update closeness list 
+count_closeness_list <- check_closeness(mice_list, count_closeness_list)
+
+
 
 
 ######################################################################

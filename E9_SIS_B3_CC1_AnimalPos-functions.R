@@ -25,6 +25,28 @@ find_id <- function(x_Pos, y_Pos, lookup_tibble) {
   }
 }
 ##############################################################################################################
+# function to check for closeness
+# input: mice_list
+# compare every sublist(4)to each other
+check_closeness <- function(mice_list,count_closeness_list){
+  
+  # compare the third value of every couple
+  # if the position is the same, save in count_closeness_list list
+  for (i in 1:3) {
+    for (j in (i+1):4) {
+      #print(c(i, j))
+      #print(mice_list[[i]][[3]]==mice_list[[j]][[3]])
+      if(mice_list[[i]][[3]]==mice_list[[j]][[3]]){
+        count_closeness_list[[i]][[j]] <- +1
+      }
+    }
+  }
+  print(count_closeness_list)
+  # return updated list of mice that are close to each other
+  return(count_closeness_list)
+}
+
+##############################################################################################################
 ## plot ##
 
 # Function for adjusting the Y-axis labelling
