@@ -106,8 +106,14 @@ count_closeness_list <- check_closeness(mice_list, count_closeness_list)
 ##assign start time(choose one of the mices start time)
 start_time <- mice_list[[1]][[2]]
 
-
 mice_list <- sec_shift(mouse_names_systemOne, mice_list, overallData_final, start_time)
+
+count_closeness_list <- check_closeness(mice_list, count_closeness_list)
+
+
+###try a loop
+
+
 
 
 

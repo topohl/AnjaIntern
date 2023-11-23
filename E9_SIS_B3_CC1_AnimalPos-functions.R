@@ -67,7 +67,7 @@ check_closeness <- function(mice_list,count_closeness_list){
       #print(c(i, j))
       #print(mice_list[[i]][[3]]==mice_list[[j]][[3]])
       if(mice_list[[i]][[3]]==mice_list[[j]][[3]]){
-        count_closeness_list[[i]][[j]] <- +1
+        count_closeness_list[[i]][[j]] <- count_closeness_list[[i]][[j]]+1
       }
     }
   }
