@@ -136,9 +136,27 @@ count_closeness_list <- list(   m1=c(0,0,0,0),
 
 #update closeness list 
 count_closeness_list <- check_closeness(mice_list, count_closeness_list)
+#################################################################################
+##assign start time(choose one of the mices start time)
+start_time <- mice_list[[1]][[2]]
+
+# function to do shift in time(one second forward)
+# return eventually alterated mice_list
+sec_shift <- function(mice_list, overallData_final, old_time){
+  #put one second on top of old_time
+  #new_time <- 
+  
+  #filter overallData_final with new_time
+  
+  # enter new data in mice_list
+  
+  return(mice_list)
+}
 
 
 
+
+######### repeat over and over
 
 ######################################################################
 
@@ -150,7 +168,3 @@ count_closeness_list <- check_closeness(mice_list, count_closeness_list)
 # function to save results in proper way
 ######################################################################
 
-# function to do shift in time(one second forward)
-# return eventually alterated mice_list
-
-######### repeat over and over
