@@ -71,7 +71,7 @@ check_closeness <- function(mice_list,count_closeness_list){
       }
     }
   }
-  print(count_closeness_list)
+  #print(count_closeness_list)
   # return updated list of mice that are close to each other
   return(count_closeness_list)
 }
@@ -84,8 +84,8 @@ sec_shift <- function( old_time){
     as.numeric()%>%
     +1%>%
     as.character()
-  cat("old time: ", old_time, "\n")
-  cat("new time: ", new_time, "\n")
+  #cat("old time: ", old_time, "\n")
+  #cat("new time: ", new_time, "\n")
   return(new_time)
 }
 
@@ -98,7 +98,7 @@ update_mice_list <- function(system_mouse_names, mice_list, overallData_final, t
   #filter overallData_final with new_time
   new_time_rows <- overallData_final%>%
     filter(DateTime == as.POSIXct(as.numeric(time), origin = "1970-01-01"))
-  print(new_time_rows)
+  #print(new_time_rows)
   
   # enter new data in mice_list
   for (i in 1:length(system_mouse_names)){ #i=1-4
@@ -109,7 +109,7 @@ update_mice_list <- function(system_mouse_names, mice_list, overallData_final, t
     mouse_entry <- new_time_rows%>%
       filter(AnimalID == mouse_name)
     
-    print(mouse_entry)
+    #print(mouse_entry)
     
     #if double position entrys for same second, take first entry
     if(nrow(mouse_entry)>1){mouse_entry <- mouse_entry%>%slice(1)}

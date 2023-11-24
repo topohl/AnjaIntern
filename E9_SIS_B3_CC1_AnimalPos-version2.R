@@ -113,16 +113,20 @@ time <- start_time
 #last_time <- "2023-04-28 11:00:14"
 last_time <- "2023-04-25 11:00:14"
 
-for(i in 1:3600){
+
+for(i in 1:432000){
   time <- sec_shift(time)
     
   mice_list <- update_mice_list(mouse_names_systemOne, mice_list, overallData_final, time)
   
   count_closeness_list <- check_closeness(mice_list, count_closeness_list)
 }
+print(count_closeness_list)
 
 
 print(as.POSIXct(as.numeric(time), origin = "1970-01-01"))
+
+#as.POSIXct(as.numeric(time), origin = "1970-01-01") == "2023-04-29 12:24:52 CEST"
 
 # Beispielzeitstempel
 #changeable in numeric state
