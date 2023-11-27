@@ -62,12 +62,15 @@ check_closeness <- function(mice_list,count_closeness_list){
   
   # compare the third value of every couple
   # if the position is the same, save in count_closeness_list list
-  for (i in 1:3) {
-    for (j in (i+1):4) {
+  for (i in 1:4) {
+    for (j in i:4) {
       #print(c(i, j))
       #print(mice_list[[i]][[3]]==mice_list[[j]][[3]])
       if(mice_list[[i]][[3]]==mice_list[[j]][[3]]){
         count_closeness_list[[i]][[j]] <- count_closeness_list[[i]][[j]]+1
+        if(j!=i){
+          count_closeness_list[[j]][[i]] <- count_closeness_list[[j]][[i]]+1
+        }
       }
     }
   }
