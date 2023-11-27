@@ -92,11 +92,11 @@ sec_shift <- function( old_time){
 ##############################################################################################################
 # update mice_list(if its possible) and return it
 # similarity to find_first_pos_and_time
-update_mice_list <- function(system_mouse_names, mice_list, overallData_final, time){
+update_mice_list <- function(system_mouse_names, mice_list, data, time){
   
   
-  #filter overallData_final with new_time
-  new_time_rows <- overallData_final%>%
+  #filter data with new_time
+  new_time_rows <- data%>%
     filter(DateTime == as.POSIXct(as.numeric(time), origin = "1970-01-01"))
   #print(new_time_rows)
   
@@ -115,7 +115,7 @@ update_mice_list <- function(system_mouse_names, mice_list, overallData_final, t
     if(nrow(mouse_entry)>1){mouse_entry <- mouse_entry%>%slice(1)}
     #if new position happened during this second
     if(nrow(mouse_entry)==1){
-      print("new entrys")
+      #print("new entrys")
       #write name, position and time into mice_list
       mice_list[i][[1]] <- mouse_name#redundant!
       
