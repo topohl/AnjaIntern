@@ -10,6 +10,7 @@ library(dplyr)
 library(lubridate)    # for rounding time, time operations in general
 library(tibble)       #important for tibble operations
 library(purrr)
+library(ggplot2)      #for plots
 
 # paths
 fileSourcePath <-  "S:/Lab_Member/Anja/Git/AnjaIntern/E9_SIS_B3_CC1_AnimalPos.csv"
@@ -114,6 +115,7 @@ time <- start_time
 last_time <- "2023-04-25 11:00:14"
 
 
+######### repeat over and over
 for(i in 1:432000){
   time <- sec_shift(time)
     
@@ -139,11 +141,33 @@ print(as.POSIXct(as.numeric(time), origin = "1970-01-01"))
 #printable in numeric state  
 #print(as.POSIXct(as.numeric(new_time), origin = "1970-01-01"))
   
-  
+
+######################################################################
+# calculate second entrys to hour entrys
+copy_list <- count_closeness_list
+count_closeness_list_hours <- lapply(copy_list, function(x) ifelse(x!=0,x/3600,x))
+# print heatmap of count_closeness_list
+
+# Konvertiere die Liste von Listen in eine Matrix
+matrix_data <- do.call(rbind, count_closeness_list_hours)
+
+dimnames(matrix_data) <- list(c("m1","m2","m3","m4"), c("m1","m2","m3","m4"))
 
 
-  
-######### repeat over and over
+#ggplot2
+install.packages("reshape")                                       # Install reshape package
+library("reshape")   
+
+data_melt <- melt(matrix_data)                                           # Reorder data
+head(data_melt) 
+
+ggp <- ggplot(data_melt, aes(X1, X2)) +                           # Create heatmap with ggplot2
+  geom_tile(aes(fill = value))+
+  scale_fill_gradient(low = "white", high = "blue") +  # Farbgradient festlegen
+  labs(title = "Heatmap der Daten", x = "X-Achse", y = "Y-Achse")  # Beschriftungen hinzufügen
+ggp                                                               # Print heatmap
+
+
 
 ######################################################################
 
