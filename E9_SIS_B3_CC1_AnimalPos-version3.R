@@ -42,7 +42,7 @@ overallData[c('AnimalID', 'System')] <- str_split_fixed(overallData$Animal, '_',
 #create Positions_tibble that contains every possible combination of our coordinates together with an ID
 positions <- select(overallData, c(xPos,yPos))
 unique_positions <- unique(positions)
-Positions_tibble <- tibble(PositionID = c(1:length(unique_positions$xPos)), xPos = unique_positions[1], yPos = unique_positions[2])
+Positions_tibble <- tibble(PositionID = c(1:8), xPos = c(0,100,200,300,0,100,200,300), yPos = c(0,0,0,0,116,116,116,116))
 
 # Adding column PositionID to overallData instead of two colums with x and y coordinates
 overallData_ids <- overallData %>% rowwise() %>%
@@ -53,7 +53,14 @@ overallData_ids <- overallData %>% rowwise() %>%
 ##### sort columns #####
 overallData <- overallData_ids[c('DateTime', 'AnimalID', 'System', 'PositionID')]
 
-################################################################################################################################
-# sort by Date Time
-overallData_ordered <- overallData%>%
+
+##### sort by Date Time #####
+overallData <- overallData%>%
   arrange(., DateTime)
+################################################################################################################################
+
+#choose system
+overallData_sys1 <- overallData%>%
+  filter(System=="sys.1")
+################################################################################################################################
+

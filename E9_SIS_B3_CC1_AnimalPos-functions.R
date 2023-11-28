@@ -14,13 +14,28 @@
 ##############################################################################################################
 # finds corresponding PositionID from two coordinates(x_Pos, y_pos) in lookup_tibble and returns ID 
 find_id <- function(x_Pos, y_Pos, lookup_tibble) {
+  
+  #give non-standard positions a standard position
+  # y value
+  if(y_Pos<116){y_Pos <- 0}
+  if(y_Pos>=116){y_Pos <- 116}
+  # x value
+  if(x_Pos<100){x_Pos <- 0}
+  if(x_Pos<200){x_Pos <- 100}
+  if(x_Pos<300){x_Pos <- 200}
+  if(x_Pos>=300){x_Pos <- 300}
+  
+  # search position in lookup table
   result <- lookup_tibble %>%
     filter(xPos == x_Pos, yPos == y_Pos) %>%
     select(PositionID)
   
+  # return new ID of specific position
   if (nrow(result) > 0) {
     return(result$PositionID)
   } else {
+    cat("xpos: ", x_Pos, " , ypos: ", y_Pos, "\n")
+    print("NA!")
     return(NA) # Return NA if no match found
   }
 }
