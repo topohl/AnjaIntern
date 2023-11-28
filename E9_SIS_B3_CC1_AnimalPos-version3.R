@@ -99,11 +99,34 @@ count_closeness_list <- list(   m1=c(0,0,0,0),
 #update mice_list to first time and first position
 mice_list <- find_first_pos_and_time(mouse_names_system1, overallData_sys1, mice_list)
 
+#update closeness list for the first time
+count_closeness_list <- check_closeness(mice_list, count_closeness_list)
+
+##assign start time(choose one of the mices start time)
+timeTemp <- mice_list[[1]][[2]]
+
+# stop the running time
+startTime <- Sys.time()
+
+
+######### repeat over and over
+#for(i in 1:432000){    #5days
+for(i in 1:6600){ 
+  #time <- sec_shift(time)
+  
+  mice_list <- update_mice_list(mouse_names_systemOne, mice_list, mice_systemOne, time)
+  
+  count_closeness_list <- check_closeness(mice_list, count_closeness_list)
+}
+print(count_closeness_list)
 
 
 
 
-
+#print the running time
+endTime <- Sys.time() 
+timeTaken <- endTime-startTime
+cat("time taken: ", timeTaken, "\n")
 
 
 

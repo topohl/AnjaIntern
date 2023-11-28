@@ -73,7 +73,7 @@ find_first_pos_and_time <- function(system_mouse_names, data, mice_list){
 # function to check for closeness
 # input: mice_list
 # compare every sublist(4)to each other
-check_closeness <- function(mice_list,count_closeness_list){
+check_closeness1 <- function(mice_list,count_closeness_list){
   
   # compare the third value of every couple
   # if the position is the same, save in count_closeness_list list
@@ -94,6 +94,16 @@ check_closeness <- function(mice_list,count_closeness_list){
   return(count_closeness_list)
 }
 
+
+
+#second version for new algorithm
+# more complex
+check_closeness <- function(mice_list,count_closeness_list){
+  
+  # return updated list of mice that are close to each other
+  return(count_closeness_list)
+}
+
 ##############################################################################################################
 # function to do shift in time(one second forward)
 sec_shift <- function( old_time){
@@ -110,7 +120,7 @@ sec_shift <- function( old_time){
 ##############################################################################################################
 # update mice_list(if its possible) and return it
 # similarity to find_first_pos_and_time
-update_mice_list <- function(system_mouse_names, mice_list, data, time){
+update_mice_list1 <- function(system_mouse_names, mice_list, data, time){
   
   
   #filter data with new_time
@@ -147,6 +157,15 @@ update_mice_list <- function(system_mouse_names, mice_list, data, time){
   return(mice_list)
 }
 
+
+#second version for new algorithm
+# more complex
+update_mice_list <- function(system_mouse_names, mice_list, data, time){
+  
+  
+ 
+  return(mice_list)
+}
 ##############################################################################################################
 ## plot ##
 

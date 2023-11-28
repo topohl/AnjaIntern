@@ -102,7 +102,7 @@ count_closeness_list <- list(   m1=c(0,0,0,0),
                                 m4=c(0,0,0,0))
 
 #update closeness list for the first time
-count_closeness_list <- check_closeness(mice_list, count_closeness_list)
+count_closeness_list <- check_closeness1(mice_list, count_closeness_list)
 #################################################################################
 ##assign start time(choose one of the mices start time)
 start_time <- mice_list[[1]][[2]]
@@ -122,9 +122,9 @@ startTime <- Sys.time()
 for(i in 1:6600){ 
   time <- sec_shift(time)
     
-  mice_list <- update_mice_list(mouse_names_systemOne, mice_list, mice_systemOne, time)
+  mice_list <- update_mice_list1(mouse_names_systemOne, mice_list, mice_systemOne, time)
   
-  count_closeness_list <- check_closeness(mice_list, count_closeness_list)
+  count_closeness_list <- check_closeness1(mice_list, count_closeness_list)
 }
 print(count_closeness_list)
 
