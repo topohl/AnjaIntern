@@ -61,6 +61,53 @@ overallData <- overallData%>%
 
 #choose system
 overallData_sys1 <- overallData%>%
-  filter(System=="sys.1")
+  filter(System=="sys.1")%>%
+  as_tibble()
+
 ################################################################################################################################
+
+# ALGORITHM: 
+
+##INITIALIZATIONS##
+mouse_names_system1 <- unique(overallData_sys1$AnimalID)
+
+
+# initialize mice lists with empty name, start time and start position of every mouse in one system(4mice together)
+mouseOne    <- list(name="", time="", position=0)
+mouseTwo    <- list(name="", time="", position=0)
+mouseThree  <- list(name="", time="", position=0)
+mouseFour   <- list(name="", time="", position=0)
+
+# combine them to a list of lists
+mice_list <- list(
+  "mouseOne" = mouseOne,
+  "mouseTwo" = mouseTwo,
+  "mouseThree" = mouseThree,
+  "mouseFour" = mouseFour)
+
+
+#initialize mice closeness result
+#m1 on the third int means number of seconds together from m1 and m3
+count_closeness_list <- list(   m1=c(0,0,0,0),
+                                m2=c(0,0,0,0),
+                                m3=c(0,0,0,0),
+                                m4=c(0,0,0,0))
+
+
+##CALCULATIONS##
+
+#update mice_list to first time and first position
+mice_list <- find_first_pos_and_time(mouse_names_system1, overallData_sys1, mice_list)
+
+
+
+
+
+
+
+
+
+
+
+
 
