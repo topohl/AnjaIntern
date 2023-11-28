@@ -42,14 +42,14 @@ find_id <- function(x_Pos, y_Pos, lookup_tibble) {
 ##############################################################################################################
 # find the FIRST TIME where mouse is tracked in the cage
 # aka first value of mouse in overallData_final
-find_first_pos_and_time <- function(system_mouse_names, overallData_final, mice_list){
+find_first_pos_and_time <- function(system_mouse_names, data, mice_list){
   
   for (i in 1:length(system_mouse_names)){ #i=1-4
     
     #rename
     mouse_name <- system_mouse_names[[i]]
     #search first entry in whole data
-    first_entry <- overallData_final%>%
+    first_entry <- data%>%
       filter(AnimalID == mouse_name)%>%
       slice(1) #first row
     
