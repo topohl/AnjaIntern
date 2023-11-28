@@ -122,7 +122,6 @@ startTime <- Sys.time()
 for(i in 1:6600){ 
   time <- sec_shift(time)
     
-  #mice_list <- update_mice_list(mouse_names_systemOne, mice_list, mice_systemOne, time)
   mice_list <- update_mice_list(mouse_names_systemOne, mice_list, mice_systemOne, time)
   
   count_closeness_list <- check_closeness(mice_list, count_closeness_list)
