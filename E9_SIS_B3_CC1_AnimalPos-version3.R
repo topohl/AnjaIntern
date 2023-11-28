@@ -54,3 +54,6 @@ overallData_ids <- overallData %>% rowwise() %>%
 overallData <- overallData_ids[c('DateTime', 'AnimalID', 'System', 'PositionID')]
 
 ################################################################################################################################
+# sort by Date Time
+overallData_ordered <- overallData%>%
+  arrange(., DateTime)
