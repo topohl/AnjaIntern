@@ -101,7 +101,7 @@ count_closeness_list <- list(   m1=c(0,0,0,0),
                                 m3=c(0,0,0,0),
                                 m4=c(0,0,0,0))
 
-#update closeness list 
+#update closeness list for the first time
 count_closeness_list <- check_closeness(mice_list, count_closeness_list)
 #################################################################################
 ##assign start time(choose one of the mices start time)
