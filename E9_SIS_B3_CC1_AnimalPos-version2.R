@@ -147,8 +147,9 @@ print(as.POSIXct(as.numeric(time), origin = "1970-01-01"))
 
 #printable in numeric state  
 #print(as.POSIXct(as.numeric(new_time), origin = "1970-01-01"))
-  
-
+ 
+#character time from time format to numeric: 
+#as.numeric(overallData_sys1[5,"DateTime"])
 ######################################################################
 # HEATMAP
 

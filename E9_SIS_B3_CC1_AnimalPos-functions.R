@@ -160,9 +160,35 @@ update_mice_list1 <- function(system_mouse_names, mice_list, data, time){
 
 #second version for new algorithm
 # more complex
-update_mice_list <- function(system_mouse_names, mice_list, data, time){
+update_mice_list <- function(system_mouse_names, mice_list, data, time, line){
   
+  #next_second <- sec_shift(time)
+  new_time <- as.numeric(data[line,"DateTime"])
+  print(new_time)
+  print(new_time-as.numeric(time))
+  # write sec difference between new and old time into secTemp
+  mice_list[["tempData"]][["secTemp"]] <- new_time-as.numeric(time)
   
+  # write new time into every mouse information
+  for(i in 1:4){mice_list[[i]][[2]] <- new_time}
+  
+  # while line(and especially the next lines) is still same time
+  while(as.numeric(data[line,"DateTime"])==new_time){
+    # write new position into special mouse
+    for(i in 1:4){
+      if(mice_list[[i]][[1]]==as.character(data[line,"AnimalID"])){mice_list[[i]][[3]] <- as.numeric(data[line,"PositionID"])}
+    }
+    line <- line+1
+  }
+  
+  # write new line into mice_list
+  mice_list[["tempData"]][["lineTemp"]] <- line
+  
+  #if(new_time==next_second){
+  #  print("yay")
+  #}else{
+  #  print("noo")
+  #}
  
   return(mice_list)
 }

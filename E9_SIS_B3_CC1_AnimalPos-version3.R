@@ -77,13 +77,15 @@ mouseOne    <- list(name="", time="", position=0)
 mouseTwo    <- list(name="", time="", position=0)
 mouseThree  <- list(name="", time="", position=0)
 mouseFour   <- list(name="", time="", position=0)
+tempData    <- list(secTemp=0, lineTemp=0)
 
 # combine them to a list of lists
 mice_list <- list(
   "mouseOne" = mouseOne,
   "mouseTwo" = mouseTwo,
   "mouseThree" = mouseThree,
-  "mouseFour" = mouseFour)
+  "mouseFour" = mouseFour,
+  "tempData" = tempData)
 
 
 #initialize mice closeness result
@@ -105,6 +107,9 @@ count_closeness_list <- check_closeness(mice_list, count_closeness_list)
 ##assign start time(choose one of the mices start time)
 timeTemp <- mice_list[[1]][[2]]
 
+#assign first line number
+lineTemp <- 5
+
 # stop the running time
 startTime <- Sys.time()
 
@@ -114,11 +119,24 @@ startTime <- Sys.time()
 for(i in 1:6600){ 
   #time <- sec_shift(time)
   
-  mice_list <- update_mice_list(mouse_names_systemOne, mice_list, mice_systemOne, time)
+  mice_list <- update_mice_list(mouse_names_system1, mice_list, overallData_sys1, timeTemp, lineTemp)
   
   count_closeness_list <- check_closeness(mice_list, count_closeness_list)
+  
+  #line <- line+1 not necessarry!!
+  #aber lineTemp <- mice_list[["tempData"]][["lineTemp"]]
 }
 print(count_closeness_list)
+
+
+
+
+#tests
+mice_list <- update_mice_list(mouse_names_system1, mice_list, overallData_sys1, timeTemp, lineTemp)
+
+
+
+as.character(overallData_sys1[5,"AnimalID"])
 
 
 
@@ -127,9 +145,6 @@ print(count_closeness_list)
 endTime <- Sys.time() 
 timeTaken <- endTime-startTime
 cat("time taken: ", timeTaken, "\n")
-
-
-
 
 
 
