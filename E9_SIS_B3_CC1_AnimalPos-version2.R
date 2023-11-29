@@ -102,7 +102,7 @@ count_closeness_list <- list(   m1=c(0,0,0,0),
                                 m4=c(0,0,0,0))
 
 #update closeness list for the first time
-count_closeness_list <- check_closeness1(mice_list, count_closeness_list)
+#count_closeness_list <- check_closeness1(mice_list, count_closeness_list)
 #################################################################################
 ##assign start time(choose one of the mices start time)
 start_time <- mice_list[[1]][[2]]
@@ -119,7 +119,7 @@ last_time <- "2023-04-25 11:00:14"
 startTime <- Sys.time()
 ######### repeat over and over
 #for(i in 1:432000){    #5days
-for(i in 1:6600){ 
+for(i in 1:35){ 
   time <- sec_shift(time)
     
   mice_list <- update_mice_list1(mouse_names_systemOne, mice_list, mice_systemOne, time)
@@ -147,6 +147,7 @@ print(as.POSIXct(as.numeric(time), origin = "1970-01-01"))
 
 #printable in numeric state  
 #print(as.POSIXct(as.numeric(new_time), origin = "1970-01-01"))
+
  
 #character time from time format to numeric: 
 #as.numeric(overallData_sys1[5,"DateTime"])

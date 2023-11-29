@@ -98,7 +98,28 @@ check_closeness1 <- function(mice_list,count_closeness_list){
 
 #second version for new algorithm
 # more complex
-check_closeness <- function(mice_list,count_closeness_list){
+check_closeness <- function(old_mice_list,new_mice_list,count_closeness_list,secTemp){
+  
+  # compare the third value of every couple
+  # if the position is the same, save in count_closeness_list list
+  for (i in 1:4) {
+    for (j in i:4) {
+      #comparisation of old_mice_list for last (secTemp-1)-missing seconds
+      if(old_mice_list[[i]][[3]]==old_mice_list[[j]][[3]]){
+        count_closeness_list[[i]][[j]] <- count_closeness_list[[i]][[j]]+(secTemp-1)  #secTemp contains x-1 seconds of old positions and one sec of new pos
+        if(j!=i){
+          count_closeness_list[[j]][[i]] <- count_closeness_list[[j]][[i]]+(secTemp-1)
+        }
+      }
+      #comparisation of new_mice_list for first new second
+      if(new_mice_list[[i]][[3]]==new_mice_list[[j]][[3]]){
+        count_closeness_list[[i]][[j]] <- count_closeness_list[[i]][[j]]+1
+        if(j!=i){
+          count_closeness_list[[j]][[i]] <- count_closeness_list[[j]][[i]]+1
+        }
+      }
+    }
+  }
   
   # return updated list of mice that are close to each other
   return(count_closeness_list)
@@ -164,14 +185,18 @@ update_mice_list <- function(system_mouse_names, mice_list, data, time, line){
   
   #next_second <- sec_shift(time)
   new_time <- as.numeric(data[line,"DateTime"])
-  print(new_time)
-  print(new_time-as.numeric(time))
+  #print(new_time)
+  #print(new_time-as.numeric(time))
   # write sec difference between new and old time into secTemp
   mice_list[["tempData"]][["secTemp"]] <- new_time-as.numeric(time)
   
   # write new time into every mouse information
   for(i in 1:4){mice_list[[i]][[2]] <- new_time}
   
+  #cat("actual time the the current line: ", line, "\n")
+  #print(as.numeric(data[line,"DateTime"]))
+  #print("new_time: ")
+  #print(new_time)
   # while line(and especially the next lines) is still same time
   while(as.numeric(data[line,"DateTime"])==new_time){
     # write new position into special mouse
