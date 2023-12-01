@@ -64,6 +64,10 @@ overallData_sys1 <- overallData%>%
   filter(System=="sys.1")%>%
   as_tibble()
 
+
+#save as csv file
+library(writexl)
+write_csv(overallData_sys1, "overallData_sys1.csv")
 ################################################################################################################################
 
 # ALGORITHM: 
@@ -121,7 +125,8 @@ startTime <- Sys.time()
 #for(i in 1:432000){    #5days
 #for(i in 1:6000){ 
 #while(lineTemp!=(6584)){#5 days(aka whole tibble, all lines in tibble)
-while(lineTemp!=(242+1)){
+theEnd <- (2935+1)
+while(lineTemp!=theEnd && lineTemp<theEnd){
   
   #create a copy of the old version of the mice list for check_closeness-function
   old_mice_list <- mice_list
@@ -138,6 +143,9 @@ while(lineTemp!=(242+1)){
   lineTemp <- mice_list[["tempData"]][["lineTemp"]]
   #and new time temp
   timeTemp <- mice_list[[1]][[2]]
+  
+  
+  #if(lineTemp>2908){break}
 }
 print(count_closeness_list)
 
@@ -152,5 +160,4 @@ cat("time taken: ", timeTaken, "\n")
 #tests
 mice_list <- update_mice_list(mouse_names_system1, mice_list, overallData_sys1, timeTemp, lineTemp)
 
-
-
+as.numeric(overallData_sys1[2939,"DateTime"])-as.numeric(overallData_sys1[1,"DateTime"])

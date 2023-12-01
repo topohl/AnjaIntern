@@ -193,17 +193,21 @@ update_mice_list <- function(system_mouse_names, mice_list, data, time, line){
   # write new time into every mouse information
   for(i in 1:4){mice_list[[i]][[2]] <- new_time}
   
-  #cat("actual time the the current line: ", line, "\n")
-  #print(as.numeric(data[line,"DateTime"]))
-  #print("new_time: ")
-  #print(new_time)
+  cat("actual time of the current line: ", line, "\n")
+  print(as.numeric(data[line,"DateTime"]))
+  print("new_time: ")
+  print(new_time)
+  
   # while line(and especially the next lines) is still same time
   while(as.numeric(data[line,"DateTime"])==new_time){
+    print("in the while loop")
     # write new position into special mouse
     for(i in 1:4){
       if(mice_list[[i]][[1]]==as.character(data[line,"AnimalID"])){mice_list[[i]][[3]] <- as.numeric(data[line,"PositionID"])}
     }
     line <- line+1
+    cat("actual time of the current line: ", line, "\n")
+    print(as.numeric(data[line,"DateTime"]))
   }
   
   # write new line into mice_list
