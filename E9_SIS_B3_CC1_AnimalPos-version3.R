@@ -130,7 +130,7 @@ mice_list <- find_first_pos_and_time(mouse_names_system1, overallData_sys1, mice
 #count_closeness_list <- check_closeness(mice_list, count_closeness_list)
 
 ##assign start time(choose one of the mices start time)
-timeTemp <- "1682331892"
+timeTemp <- mice_list[[1]][[2]]
 
 #assign first line number
 lineTemp <- 5
