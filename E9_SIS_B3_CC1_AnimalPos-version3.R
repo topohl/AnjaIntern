@@ -125,6 +125,7 @@ count_closeness_list <- list(   m1=c(0,0,0,0),
 #update mice_list to first time and first position
 mice_list <- find_first_pos_and_time(mouse_names_system1, overallData_sys1, mice_list)
 
+
 #update closeness list for the first time
 #count_closeness_list <- check_closeness(mice_list, count_closeness_list)
 

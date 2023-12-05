@@ -44,6 +44,9 @@ find_id <- function(x_Pos, y_Pos, lookup_tibble) {
 # aka first value of mouse in overallData_final
 find_first_pos_and_time <- function(system_mouse_names, data, mice_list){
   
+  # create empty vector with 4 variables
+  times_vec <- rep(NA, times=4)
+  
   for (i in 1:length(system_mouse_names)){ #i=1-4
     
     #rename
@@ -61,10 +64,25 @@ find_first_pos_and_time <- function(system_mouse_names, data, mice_list){
     mice_list[[i]][[2]] <- first_time
     #print(first_time)
     
+    #enter time in times vec fot later to compare
+    times_vec[i] <- first_time
+    
     first_position <- first_entry$PositionID
     mice_list[[i]][[3]] <- first_position
     #print(first_position)
   }
+  
+  #check, if all times are similar
+  #if not, change them all to the first shared time
+  print(times_vec)
+  if(length(unique(times_vec)) != 1){
+    latest_time <- max(times_vec)
+    print(latest_time)
+    for(i in 1:4){
+      mice_list[[i]][[2]] <- latest_time
+    }
+  }
+  
   return(mice_list)
 }
 
