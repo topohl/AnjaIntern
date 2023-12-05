@@ -59,15 +59,35 @@ overallData <- overallData%>%
   arrange(., DateTime)
 ################################################################################################################################
 
-#choose system
+
+#define systems
 overallData_sys1 <- overallData%>%
   filter(System=="sys.1")%>%
   as_tibble()
 
+overallData_sys2 <- overallData%>%
+  filter(System=="sys.2")%>%
+  as_tibble()
+
+overallData_sys3 <- overallData%>%
+  filter(System=="sys.3")%>%
+  as_tibble()
+
+overallData_sys4 <- overallData%>%
+  filter(System=="sys.4")%>%
+  as_tibble()
+
+overallData_sys5 <- overallData%>%
+  filter(System=="sys.5")%>%
+  as_tibble()
+
+# create a vector of the five systems
+systems_vector <- c(overallData_sys1, overallData_sys2, overallData_sys3, overallData_sys4, overallData_sys5)
+
 
 #save as csv file
-library(writexl)
-write_csv(overallData_sys1, "overallData_sys1.csv")
+#library(writexl)
+#write_csv(overallData_sys1, "overallData_sys1.csv")
 ################################################################################################################################
 
 # ALGORITHM: 
