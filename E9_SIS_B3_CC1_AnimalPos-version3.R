@@ -117,13 +117,9 @@ lineTemp <- 5
 #assign firt seconds difference
 secTemp <- 0
 
-# stop the running time
-startTime <- Sys.time()
-
 
 ######### repeat over and over
-#for(i in 1:432000){    #5days
-#for(i in 1:6000){ 
+
 #while(lineTemp!=(6584)){#5 days(aka whole tibble, all lines in tibble)
 theEnd <- (6584+1)
 while(lineTemp!=theEnd && lineTemp<theEnd){
@@ -151,13 +147,37 @@ print(count_closeness_list)
 
 
 
-#print the running time
-endTime <- Sys.time() 
-timeTaken <- endTime-startTime
-cat("time taken: ", timeTaken, "\n")
 
 
-#tests
-mice_list <- update_mice_list(mouse_names_system1, mice_list, overallData_sys1, timeTemp, lineTemp)
+############################################################################################
+## PLOT ##
+######################################################################
+# HEATMAP
 
-as.numeric(overallData_sys1[2939,"DateTime"])-as.numeric(overallData_sys1[1,"DateTime"])
+# calculate second entrys to hour entrys
+copy_list <- count_closeness_list
+count_closeness_list_hours <- lapply(copy_list, function(x) ifelse(x!=0,x/3600,x))
+
+
+# print heatmap of count_closeness_list
+
+# Konvertiere die Liste von Listen in eine Matrix
+matrix_data <- do.call(rbind, count_closeness_list_hours)
+
+# names of the mice Ids
+dimnames(matrix_data) <- list(mouse_names_system1, mouse_names_system1)
+
+
+#ggplot2
+install.packages("reshape")                                       # Install reshape package
+library("reshape")   
+
+data_melt <- melt(matrix_data)                                          # Reorder data
+head(data_melt) 
+
+ggp <- ggplot(data_melt, aes(X1, X2)) +                                 # Create heatmap with ggplot2
+  geom_tile(aes(fill = value))+
+  scale_fill_gradient(low = "white", high = "blue") +                   # define colour gradient
+  labs(title = "System-1: mice closeness in hours", x = "X", y = "Y")   # add labels and caption
+ggp                                                                     # Print heatmap
+
