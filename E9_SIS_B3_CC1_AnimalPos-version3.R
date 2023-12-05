@@ -125,7 +125,7 @@ startTime <- Sys.time()
 #for(i in 1:432000){    #5days
 #for(i in 1:6000){ 
 #while(lineTemp!=(6584)){#5 days(aka whole tibble, all lines in tibble)
-theEnd <- (2935+1)
+theEnd <- (6583+1)
 while(lineTemp!=theEnd && lineTemp<theEnd){
   
   #create a copy of the old version of the mice list for check_closeness-function

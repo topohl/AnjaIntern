@@ -119,7 +119,7 @@ last_time <- "2023-04-25 11:00:14"
 startTime <- Sys.time()
 ######### repeat over and over
 #for(i in 1:432000){    #5days
-for(i in 1:126708){ 
+for(i in 1:341482){ 
   time <- sec_shift(time)
     
   mice_list <- update_mice_list1(mouse_names_systemOne, mice_list, mice_systemOne, time)
@@ -131,6 +131,7 @@ print(count_closeness_list)
 endTime <- Sys.time() 
 timeTaken <- endTime-startTime
 cat("time taken: ", timeTaken, "\n")
+
 
 
 print(as.POSIXct(as.numeric(time), origin = "1970-01-01"))

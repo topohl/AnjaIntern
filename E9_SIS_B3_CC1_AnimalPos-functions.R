@@ -161,7 +161,7 @@ update_mice_list1 <- function(system_mouse_names, mice_list, data, time){
     #print(mouse_entry)
     
     #if double position entrys for same second, take first entry
-    if(nrow(mouse_entry)>1){mouse_entry <- mouse_entry%>%slice(1)}
+    if(nrow(mouse_entry)>1){mouse_entry <- mouse_entry%>%slice(nrow(mouse_entry))}
     #if new position happened during this second
     if(nrow(mouse_entry)==1){
       #print("new entrys")
