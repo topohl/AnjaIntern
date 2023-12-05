@@ -95,7 +95,9 @@ check_closeness1 <- function(mice_list,count_closeness_list){
 }
 
 
-
+# function to check for closeness
+# input: mice_list
+# compare every sublist(4)to each other
 #second version for new algorithm
 # more complex
 check_closeness <- function(old_mice_list,new_mice_list,count_closeness_list,secTemp){
@@ -178,46 +180,41 @@ update_mice_list1 <- function(system_mouse_names, mice_list, data, time){
   return(mice_list)
 }
 
-
+# update mice_list(if its possible) and return it
+# similarity to find_first_pos_and_time
 #second version for new algorithm
 # more complex
 update_mice_list <- function(system_mouse_names, mice_list, data, time, line){
   
   #next_second <- sec_shift(time)
   new_time <- as.numeric(data[line,"DateTime"])
-  #print(new_time)
-  #print(new_time-as.numeric(time))
+
   # write sec difference between new and old time into secTemp
   mice_list[["tempData"]][["secTemp"]] <- new_time-as.numeric(time)
   
   # write new time into every mouse information
   for(i in 1:4){mice_list[[i]][[2]] <- new_time}
-  
-  cat("actual time of the current line: ", line, "\n")
-  print(as.numeric(data[line,"DateTime"]))
-  print("new_time: ")
-  print(new_time)
+ 
   
   # while line(and especially the next lines) is still same time
   while(as.numeric(data[line,"DateTime"])==new_time){
-    print("in the while loop")
     # write new position into special mouse
     for(i in 1:4){
       if(mice_list[[i]][[1]]==as.character(data[line,"AnimalID"])){mice_list[[i]][[3]] <- as.numeric(data[line,"PositionID"])}
     }
+    #if line is not the last line, check next line, else break while loop
+    if(line==nrow(data)){
+      line <- line+1
+      break
+    }
+    #continue with the while condition
     line <- line+1
-    cat("actual time of the current line: ", line, "\n")
-    print(as.numeric(data[line,"DateTime"]))
+    
   }
   
   # write new line into mice_list
   mice_list[["tempData"]][["lineTemp"]] <- line
   
-  #if(new_time==next_second){
-  #  print("yay")
-  #}else{
-  #  print("noo")
-  #}
  
   return(mice_list)
 }
