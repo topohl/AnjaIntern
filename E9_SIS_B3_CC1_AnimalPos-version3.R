@@ -82,89 +82,97 @@ overallData_sys5 <- overallData%>%
   as_tibble()
 
 # create a vector of the five systems
-systems_vector <- c(overallData_sys1, overallData_sys2, overallData_sys3, overallData_sys4, overallData_sys5)
-
+systems_vector <- list(overallData_sys1, overallData_sys2, overallData_sys3, overallData_sys4, overallData_sys5)
+typeof(systems_vector)
 
 #save as csv file
 #library(writexl)
 #write_csv(overallData_sys1, "overallData_sys1.csv")
 ################################################################################################################################
 
-# ALGORITHM: 
-
-##INITIALIZATIONS##
-mouse_names_system1 <- unique(overallData_sys1$AnimalID)
 
 
-# initialize mice lists with empty name, start time and start position of every mouse in one system(4mice together)
-mouseOne    <- list(name="", time="", position=0)
-mouseTwo    <- list(name="", time="", position=0)
-mouseThree  <- list(name="", time="", position=0)
-mouseFour   <- list(name="", time="", position=0)
-tempData    <- list(secTemp=0, lineTemp=0)
-
-# combine them to a list of lists
-mice_list <- list(
-  "mouseOne" = mouseOne,
-  "mouseTwo" = mouseTwo,
-  "mouseThree" = mouseThree,
-  "mouseFour" = mouseFour,
-  "tempData" = tempData)
-
-
-#initialize mice closeness result
-#m1 on the third int means number of seconds together from m1 and m3
-count_closeness_list <- list(   m1=c(0,0,0,0),
-                                m2=c(0,0,0,0),
-                                m3=c(0,0,0,0),
-                                m4=c(0,0,0,0))
-
-
-##CALCULATIONS##
-
-#update mice_list to first time and first position
-mice_list <- find_first_pos_and_time(mouse_names_system1, overallData_sys1, mice_list)
-
-
-#update closeness list for the first time
-#count_closeness_list <- check_closeness(mice_list, count_closeness_list)
-
-##assign start time(choose one of the mices start time)
-timeTemp <- mice_list[[1]][[2]]
-
-#assign first line number
-lineTemp <- 5
-
-#assign firt seconds difference
-secTemp <- 0
-
-
-######### repeat over and over
-
-#while(lineTemp!=(6584)){#5 days(aka whole tibble, all lines in tibble)
-theEnd <- (6584+1)
-while(lineTemp!=theEnd && lineTemp<theEnd){
+for(i in 1:length(systems_vector)){
+  cat("round", i, "\n")
+  system <- systems_vector[[i]]
+  print(system)
   
-  #create a copy of the old version of the mice list for check_closeness-function
-  old_mice_list <- mice_list
+  # ALGORITHM: 
   
-  mice_list <- update_mice_list(mouse_names_system1, mice_list, overallData_sys1, timeTemp, lineTemp)
+  ##INITIALIZATIONS##
+  mouse_names <- unique(system$AnimalID)
   
-  #secTemp aus mice list
-  secTemp <-  mice_list[["tempData"]][["secTemp"]]
   
-  count_closeness_list <- check_closeness(old_mice_list,mice_list,count_closeness_list, secTemp)
+  # initialize mice lists with empty name, start time and start position of every mouse in one system(4mice together)
+  mouseOne    <- list(name="", time="", position=0)
+  mouseTwo    <- list(name="", time="", position=0)
+  mouseThree  <- list(name="", time="", position=0)
+  mouseFour   <- list(name="", time="", position=0)
+  tempData    <- list(secTemp=0, lineTemp=0)
   
-  #line <- line+1 not necessarry!!
-  #aber:
-  lineTemp <- mice_list[["tempData"]][["lineTemp"]]
-  #and new time temp
+  # combine them to a list of lists
+  mice_list <- list(
+    "mouseOne" = mouseOne,
+    "mouseTwo" = mouseTwo,
+    "mouseThree" = mouseThree,
+    "mouseFour" = mouseFour,
+    "tempData" = tempData)
+  
+  
+  #initialize mice closeness result
+  #m1 on the third int means number of seconds together from m1 and m3
+  count_closeness_list <- list(   m1=c(0,0,0,0),
+                                  m2=c(0,0,0,0),
+                                  m3=c(0,0,0,0),
+                                  m4=c(0,0,0,0))
+  
+  
+  ##CALCULATIONS##
+  
+  #update mice_list to first time and first position
+  mice_list <- find_first_pos_and_time(mouse_names, system, mice_list)
+  
+  
+  #update closeness list for the first time
+  #count_closeness_list <- check_closeness(mice_list, count_closeness_list)
+  
+  ##assign start time(choose one of the mices start time)
   timeTemp <- mice_list[[1]][[2]]
   
+  #assign first line number
+  lineTemp <- 5
   
-  #if(lineTemp>2908){break}
+  #assign firt seconds difference
+  secTemp <- 0
+  
+  
+  ######### repeat over and over
+  
+  theEnd <- nrow(system)+1
+  while(lineTemp!=theEnd && lineTemp<theEnd){
+    
+    #create a copy of the old version of the mice list for check_closeness-function
+    old_mice_list <- mice_list
+    
+    mice_list <- update_mice_list(mouse_names_system1, mice_list, overallData_sys1, timeTemp, lineTemp)
+    
+    #secTemp aus mice list
+    secTemp <-  mice_list[["tempData"]][["secTemp"]]
+    
+    count_closeness_list <- check_closeness(old_mice_list,mice_list,count_closeness_list, secTemp)
+    
+    #line <- line+1 not necessarry!!
+    #aber:
+    lineTemp <- mice_list[["tempData"]][["lineTemp"]]
+    #and new time temp
+    timeTemp <- mice_list[[1]][[2]]
+    
+    
+  }
+  print(count_closeness_list)
+  
 }
-print(count_closeness_list)
+
 
 
 
