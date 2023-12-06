@@ -188,46 +188,4 @@ for(i in 1:length(systems_vector)){
 gridExtra::grid.arrange(grobs = allHeatmaps, ncol = 2)
 
 
-############################################################################################
-## PLOT ##
-######################################################################
-# HEATMAP
-
-generateHeatMap <- function(count_closeness_list, systemNum, mouse_names){
-  # calculate second entrys to hour entrys
-  count_closeness_list_hours <- lapply(count_closeness_list, function(x) ifelse(x!=0,x/3600,x))
-  
-
-  
-  # convert list of lists into a matrix
-  matrix_data <- do.call(rbind, count_closeness_list_hours)
-  
-  # names of the mice Ids
-  dimnames(matrix_data) <- list(mouse_names, mouse_names)
-  
-    
-  # melt the data, means create values combinations out of the matrix
-  data_melt <- melt(matrix_data, as.is = TRUE, value.name = "hours")                                          # Reorder data
-  head(data_melt) 
-  
-  
-  #colourScale <- c("#0000FF", "#0560FF", "#2000FF", "#4000FF", "#6000FF", "#8000FF", "#A000FF", "#C000FF", "#EE00FF", "#99AAFF", "#0090FF")
-  #value_ranges <- c("40", "50", "70", "90")  # Beispielwertebereiche
-  #colors <- c("blue", "lightblue", "red", "darkred" )  # Beispiel-Farben
-  
-  #data_melt$hours <- as.factor(data_melt$hours)
-  
-  #create the plot
-  ggp <- ggplot(data_melt, aes(Var1, Var2)) +                                 # Create heatmap with ggplot2
-    geom_tile(aes(fill = hours))+
-    #scale_fill_gradient(low = "white", high = "blue") +
-    #scale_fill_gradientn(colors=colourScale) +# define colour gradient
-    #scale_fill_gradient2(low = "darkblue",mid="blue", high = "red")+
-    #scale_fill_manual(values = c("90" = "red", "70" = "lightblue", "50" = "blue"))+
-    #scale_fill_manual(values = setNames(colors, value_ranges))+
-    scale_fill_gradientn(colors = c("blue", "red"), values = rescale(c(min(data_melt), max(data_melt))))+
-    labs(title = "system", i,": mice close contact in hours", x = "X", y = "Y")   # add labels and caption
- 
-  return(ggp)            
-}
 

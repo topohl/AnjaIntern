@@ -236,6 +236,37 @@ update_mice_list <- function(system_mouse_names, mice_list, data, time, line){
  
   return(mice_list)
 }
+
+############################################################################################
+## PLOT ##
+######################################################################
+# HEATMAP
+generateHeatMap <- function(count_closeness_list, systemNum, mouse_names){
+  # calculate second entrys to hour entrys
+  count_closeness_list_hours <- lapply(count_closeness_list, function(x) ifelse(x!=0,x/3600,x))
+  
+  
+  
+  # convert list of lists into a matrix
+  matrix_data <- do.call(rbind, count_closeness_list_hours)
+  
+  # names of the mice Ids
+  dimnames(matrix_data) <- list(mouse_names, mouse_names)
+  
+  
+  # melt the data, means create values combinations out of the matrix
+  data_melt <- melt(matrix_data, as.is = TRUE, value.name = "hours")                                          # Reorder data
+  head(data_melt) 
+  
+  #create the plot
+  ggp <- ggplot(data_melt, aes(Var1, Var2)) +                                 # Create heatmap with ggplot2
+    geom_tile(aes(fill = hours))+
+    scale_fill_gradientn(colors = c("blue","white", "red"), values = rescale(c(min(data_melt$hours), max(data_melt$hours))))+
+    labs(title = "system", i,": mice close contact in hours", x = "X", y = "Y")   # add labels and caption
+  
+  return(ggp)            
+}
+
 ##############################################################################################################
 ## plot ##
 
