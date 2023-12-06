@@ -11,6 +11,7 @@ library(lubridate)    # for rounding time, time operations in general
 library(tibble)       #important for tibble operations
 library(purrr)
 library(ggplot2)      #for plots
+library(reshape2)     #for heatmap plot
 
 # paths
 working_directory <- "S:/Lab_Member/Anja/Git/AnjaIntern"
@@ -90,12 +91,14 @@ typeof(systems_vector)
 #write_csv(overallData_sys1, "overallData_sys1.csv")
 ################################################################################################################################
 
-
+#initialize result heatmap list
+allHeatmaps <- list()
 
 for(i in 1:length(systems_vector)){
+#for(i in 5){
   cat("round", i, "\n")
   system <- systems_vector[[i]]
-  print(system)
+  #print(system)
   
   # ALGORITHM: 
   
@@ -132,6 +135,7 @@ for(i in 1:length(systems_vector)){
   #update mice_list to first time and first position
   mice_list <- find_first_pos_and_time(mouse_names, system, mice_list)
   
+  print(mice_list)
   
   #update closeness list for the first time
   #count_closeness_list <- check_closeness(mice_list, count_closeness_list)
@@ -154,7 +158,7 @@ for(i in 1:length(systems_vector)){
     #create a copy of the old version of the mice list for check_closeness-function
     old_mice_list <- mice_list
     
-    mice_list <- update_mice_list(mouse_names_system1, mice_list, overallData_sys1, timeTemp, lineTemp)
+    mice_list <- update_mice_list(mouse_names, mice_list, system, timeTemp, lineTemp)
     
     #secTemp aus mice list
     secTemp <-  mice_list[["tempData"]][["secTemp"]]
@@ -171,11 +175,17 @@ for(i in 1:length(systems_vector)){
   }
   print(count_closeness_list)
   
+  #generate heatmaps
+  heatmap <- generateHeatMap(count_closeness_list, i, mouse_names)
+  allHeatmaps <- c(allHeatmaps, list(heatmap))
 }
 
 
 
+############### show plots in R ########################################################################
 
+# Create a grid of plots
+gridExtra::grid.arrange(grobs = allHeatmaps, ncol = 2)
 
 
 ############################################################################################
@@ -183,30 +193,36 @@ for(i in 1:length(systems_vector)){
 ######################################################################
 # HEATMAP
 
-# calculate second entrys to hour entrys
-copy_list <- count_closeness_list
-count_closeness_list_hours <- lapply(copy_list, function(x) ifelse(x!=0,x/3600,x))
+generateHeatMap <- function(count_closeness_list, systemNum, mouse_names){
+  # calculate second entrys to hour entrys
+  count_closeness_list_hours <- lapply(count_closeness_list, function(x) ifelse(x!=0,x/3600,x))
+  
 
+  
+  # convert list of lists into a matrix
+  matrix_data <- do.call(rbind, count_closeness_list_hours)
+  
+  # names of the mice Ids
+  dimnames(matrix_data) <- list(mouse_names, mouse_names)
+  
+    
+  # melt the data, means create values combinations out of the matrix
+  data_melt <- melt(matrix_data, as.is = TRUE, value.name = "hours")                                          # Reorder data
+  head(data_melt) 
+  
+  #create the plot
+  ggp <- ggplot(data_melt, aes(Var1, Var2)) +                                 # Create heatmap with ggplot2
+    geom_tile(aes(fill = hours))+
+    scale_fill_gradient(low = "white", high = "blue") +                   # define colour gradient
+    labs(title = "system", i,": mice close contact in hours", x = "X", y = "Y")   # add labels and caption
+ 
+  return(ggp)            
+}
 
-# print heatmap of count_closeness_list
+heatmap <- generateHeatMap(count_closeness_list, 2)
 
-# Konvertiere die Liste von Listen in eine Matrix
-matrix_data <- do.call(rbind, count_closeness_list_hours)
-
-# names of the mice Ids
-dimnames(matrix_data) <- list(mouse_names_system1, mouse_names_system1)
-
-
-#ggplot2
-install.packages("reshape")                                       # Install reshape package
-library("reshape")   
-
-data_melt <- melt(matrix_data)                                          # Reorder data
-head(data_melt) 
-
-ggp <- ggplot(data_melt, aes(X1, X2)) +                                 # Create heatmap with ggplot2
+ggp <- ggplot(count_closeness_list_hours, aes(Var1, Var2)) +                                 # Create heatmap with ggplot2
   geom_tile(aes(fill = value))+
   scale_fill_gradient(low = "white", high = "blue") +                   # define colour gradient
-  labs(title = "System-1: mice closeness in hours", x = "X", y = "Y")   # add labels and caption
-ggp                                                                     # Print heatmap
-
+  labs(title = "system", i,": mice close contact in hours", x = "X", y = "Y")   # add labels and caption
+ggp
