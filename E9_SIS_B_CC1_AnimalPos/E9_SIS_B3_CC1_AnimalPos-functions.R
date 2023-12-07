@@ -88,36 +88,10 @@ find_first_pos_and_time <- function(system_mouse_names, data, mice_list){
 
 
 ##############################################################################################################
-# function to check for closeness
-# input: mice_list
-# compare every sublist(4)to each other
-check_closeness1 <- function(mice_list,count_closeness_list){
-  
-  # compare the third value of every couple
-  # if the position is the same, save in count_closeness_list list
-  for (i in 1:4) {
-    for (j in i:4) {
-      #print(c(i, j))
-      #print(mice_list[[i]][[3]]==mice_list[[j]][[3]])
-      if(mice_list[[i]][[3]]==mice_list[[j]][[3]]){
-        count_closeness_list[[i]][[j]] <- count_closeness_list[[i]][[j]]+1
-        if(j!=i){
-          count_closeness_list[[j]][[i]] <- count_closeness_list[[j]][[i]]+1
-        }
-      }
-    }
-  }
-  #print(count_closeness_list)
-  # return updated list of mice that are close to each other
-  return(count_closeness_list)
-}
-
 
 # function to check for closeness
 # input: mice_list
 # compare every sublist(4)to each other
-#second version for new algorithm
-# more complex
 check_closeness <- function(old_mice_list,new_mice_list,count_closeness_list,secTemp){
   
   # compare the third value of every couple
@@ -159,49 +133,9 @@ sec_shift <- function( old_time){
 }
 
 ##############################################################################################################
-# update mice_list(if its possible) and return it
-# similarity to find_first_pos_and_time
-update_mice_list1 <- function(system_mouse_names, mice_list, data, time){
-  
-  
-  #filter data with new_time
-  new_time_rows <- data%>%
-    filter(DateTime == as.POSIXct(as.numeric(time), origin = "1970-01-01"))
-  #print(new_time_rows)
-  
-  # enter new data in mice_list
-  for (i in 1:length(system_mouse_names)){ #i=1-4
-    
-    #rename
-    mouse_name <- system_mouse_names[[i]]
-    #search current animal
-    mouse_entry <- new_time_rows%>%
-      filter(AnimalID == mouse_name)
-    
-    #print(mouse_entry)
-    
-    #if double position entrys for same second, take first entry
-    if(nrow(mouse_entry)>1){mouse_entry <- mouse_entry%>%slice(nrow(mouse_entry))}
-    #if new position happened during this second
-    if(nrow(mouse_entry)==1){
-      #print("new entrys")
-      #write name, position and time into mice_list
-      mice_list[i][[1]] <- mouse_name#redundant!
-      
-      mice_list[[i]][[2]] <- time #mouse_entry$DateTime?
-      
-      mice_list[[i]][[3]] <- mouse_entry$PositionID
-    }
-    
-  }
-  
-  return(mice_list)
-}
 
 # update mice_list(if its possible) and return it
 # similarity to find_first_pos_and_time
-#second version for new algorithm
-# more complex
 update_mice_list <- function(system_mouse_names, mice_list, data, time, line){
   
   #next_second <- sec_shift(time)
@@ -267,46 +201,3 @@ generateHeatMap <- function(count_closeness_list, systemNum, mouse_names){
   return(ggp)            
 }
 
-##############################################################################################################
-## plot ##
-
-# Function for adjusting the Y-axis labelling
-custom_labels <- function(x) {
-  labels <- ifelse(x %% 1 == 0, "", as.character(x - 0.5))  # show even numbers on odd place(number 1 on place 1.5), dont show even place numbers 
-  return(labels)
-}
-
-#function to plot 4 different mice an their movement in the cage
-plot_micePositions_together <- function(m1, m2){#startTime,, m2, m3, m4 ...
-  
-  #alterate y-points to 0,125
-  m1 <- m1%>%mutate(PrettyPos = map_dbl(m1$PositionID, ~ .+0.125))#(m1$PositionID, ~ .+0.125))
-  m2 <- m2%>%mutate(PrettyPos = map_dbl(m2$PositionID, ~ .+0.325))#(m1$PositionID, ~ .+0.325))
-  #define data
-  data1 <- data.frame(
-    time = m1$DateTime,
-    position = m1$PrettyPos
-  )
-  data2 <- data.frame(
-    time = m2$DateTime,
-    position = m2$PrettyPos
-  )
-  
-  
-  ggplot() +
-    geom_point(data = data1, aes(x = time, y = position), size = 1, color = "blue") +
-    geom_segment(data = data1 %>% mutate(next_time = lead(time, default = last(time))),
-                 aes(x = time, xend = next_time, y = position, yend = position),
-                 arrow = arrow(length = unit(0.1, "cm")), size = 0.5, color = "blue") +
-    geom_point(data = data2, aes(x = time, y = position), size = 1, color = "red") +
-    geom_segment(data = data2 %>% mutate(next_time = lead(time, default = last(time))),
-                 aes(x = time, xend = next_time, y = position, yend = position),
-                 arrow = arrow(length = unit(0.1, "cm")), size = 0.5, color = "red") +
-    geom_hline(yintercept = 1:8, color = "black", linetype = "solid", size = 0.5) + 
-    scale_x_datetime(date_breaks = "2 hours", date_labels = "%H:%M") +  # X-Achsenbeschriftung
-    scale_y_continuous(breaks = seq(1.0,9.0, by=0.5), labels = custom_labels) +  # Y-Achsenbeschriftung
-    labs(x = "Zeitspanne (24h)", y = "Felder (1-8)",
-         title = "Vier Reihen von Punkten mit waagerechten Linien",
-         color = "Datenreihe") +
-    theme_minimal()
-}
