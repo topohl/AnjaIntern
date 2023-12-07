@@ -14,7 +14,7 @@ library(ggplot2)      #for plots
 library(reshape2)     #for heatmap plot
 
 # paths
-working_directory <- "S:/Lab_Member/Anja/Git/AnjaIntern"
+working_directory <- "S:/Lab_Member/Anja/Git/AnjaIntern/E9_SIS_B_CC1_AnimalPos"
 fileSourcePath <-  paste0(working_directory,"/E9_SIS_B3_CC1_AnimalPos.csv")
 
 #fuctions
