@@ -1,65 +1,32 @@
 ## 11/2023
 ## Anja Magister
-## ANALYSIS OF ANIMAL POSITIONS - VERSION3 ##
+## ANALYSIS OF ANIMAL POSITIONS - ANALYZING ##
 ##
 
 # libraries
 library(readr)        # load readr package for reading csv files
-library(stringr)
 library(dplyr)
 library(lubridate)    # for rounding time, time operations in general
 library(tibble)       #important for tibble operations
 library(purrr)
 library(ggplot2)      #for plots
 library(reshape2)     #for heatmap plot
+library(scales)       # for heatmap rescale
 
 # paths
 working_directory <- "S:/Lab_Member/Anja/Git/AnjaIntern/E9_SIS_B_CC1_AnimalPos"
-fileSourcePath <-  paste0(working_directory,"/E9_SIS_B3_CC1_AnimalPos.csv")
+#path of csv file 
+csvFilePath <-  paste0(working_directory,"/overallData_preprocessed.csv")
 
-#fuctions
+#functions
 source(paste0(working_directory,"/E9_SIS_B3_CC1_AnimalPos-functions.R"))
 
-# read csv file in tibble
+# read preprocessed data(csv file) in tibble
+overallData <- as_tibble(read_delim(csvFilePath,delim = ",", show_col_types = FALSE))
 
-overallData <- as_tibble(read_delim(fileSourcePath,delim = ";", show_col_types = FALSE))
-
-####################################################################################################################################
-###### PREPROCESSING OF overallData: ######
-
-# delete unnecessary columns
-overallData <- select(overallData, -c(RFID, AM, zPos))
-# convert the DateTime column to a datetime format(also rounds the DateTime)
-overallData$DateTime <- as.POSIXct(overallData$DateTime, format = "%d.%m.%Y %H:%M:%S")
-
-# separate Animal into his ID an his system
-overallData[c('AnimalID', 'System')] <- str_split_fixed(overallData$Animal, '_', 2)
-
-
-
-
-###### convert xPos and yPos into one column named "PositionID" ######
-
-#create Positions_tibble that contains every possible combination of our coordinates together with an ID
-positions <- select(overallData, c(xPos,yPos))
-unique_positions <- unique(positions)
-Positions_tibble <- tibble(PositionID = c(1:8), xPos = c(0,100,200,300,0,100,200,300), yPos = c(0,0,0,0,116,116,116,116))
-
-# Adding column PositionID to overallData instead of two colums with x and y coordinates
-overallData_ids <- overallData %>% rowwise() %>%
-  mutate(PositionID = find_id(xPos, yPos, Positions_tibble))
-
-
-
-##### sort columns #####
-overallData <- overallData_ids[c('DateTime', 'AnimalID', 'System', 'PositionID')]
-
-
-##### sort by Date Time #####
-overallData <- overallData%>%
-  arrange(., DateTime)
 ################################################################################################################################
-
+## given data "overallData" has already been processed ##
+################################################################################################################################
 
 #define systems
 overallData_sys1 <- overallData%>%
@@ -86,17 +53,14 @@ overallData_sys5 <- overallData%>%
 systems_vector <- list(overallData_sys1, overallData_sys2, overallData_sys3, overallData_sys4, overallData_sys5)
 typeof(systems_vector)
 
-#save as csv file
-#library(writexl)
-#write_csv(overallData_sys1, "overallData_sys1.csv")
+
 ################################################################################################################################
 
 #initialize result heatmap list
 allHeatmaps <- list()
 
 for(i in 1:length(systems_vector)){
-#for(i in 5){
-  cat("round", i, "\n")
+  #cat("round", i, "\n")
   system <- systems_vector[[i]]
   #print(system)
   
@@ -135,8 +99,11 @@ for(i in 1:length(systems_vector)){
   #update mice_list to first time and first position
   mice_list <- find_first_pos_and_time(mouse_names, system, mice_list)
   
-  print(mice_list)
   
+  #print(mice_list)
+  
+  
+  #still necessary??
   #update closeness list for the first time
   #count_closeness_list <- check_closeness(mice_list, count_closeness_list)
   

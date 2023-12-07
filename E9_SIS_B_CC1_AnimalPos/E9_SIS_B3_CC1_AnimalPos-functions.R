@@ -74,10 +74,10 @@ find_first_pos_and_time <- function(system_mouse_names, data, mice_list){
   
   #check, if all times are similar
   #if not, change them all to the first shared time
-  print(times_vec)
+  #print(times_vec)
   if(length(unique(times_vec)) != 1){
     latest_time <- max(times_vec)
-    print(latest_time)
+    #print(latest_time)
     for(i in 1:4){
       mice_list[[i]][[2]] <- latest_time
     }
